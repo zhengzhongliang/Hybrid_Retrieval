@@ -247,7 +247,7 @@ def main():
     parser.add_argument("--n_epoch", type=int, default=4)
     parser.add_argument("--n_worker", type=int, default=3)
     parser.add_argument("--n_neg_sample", type=int, default=5)
-    parser.add_argument("--num_sample", type=int, default=2000)
+    parser.add_argument("--num_dev", type=int, default=2000)
 
     # parse the input arguments
     args = parser.parse_args()
