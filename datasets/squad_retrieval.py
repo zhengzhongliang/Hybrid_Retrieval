@@ -226,7 +226,7 @@ def convert_squad_to_retrieval(tokenizer, squad_json_train_path = parent_folder_
         with open(pickle_save_path_complete, "rb") as handle:
             squad_retrieval_pickle = pickle.load(handle)
 
-        return squad_retrieval_pickle["train_list"], squad_retrieval_pickle["dev_list"], squad_retrieval_pickle["test_list"], squad_retrieval_pickle["sent_list"], squad_retrieval_pickle["doc_list"], squad_retrieval_pickle["resp_list"], squad_retrieval_pickle["sent_list_raw"], squad_retrieval_pickle["doc_list_raw"]
+        return squad_retrieval_pickle
 
     # Otherwise generate from scratch and save to pickle
     else:
