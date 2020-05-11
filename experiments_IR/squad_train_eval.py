@@ -246,7 +246,7 @@ def main():
     # device, batch_size, n_epoch, num_workers, n_neg_sample,
     parser = argparse.ArgumentParser(description='Process some integers.')
 
-    parser.add_argument("--device", type=str, default="cpu")
+    parser.add_argument("--device", type=str, default="cuda:0")
     parser.add_argument("--seed", type=int, default=0)
     parser.add_argument("--batch_size", type=int, default=1)
     parser.add_argument("--n_epoch", type=int, default=4)
