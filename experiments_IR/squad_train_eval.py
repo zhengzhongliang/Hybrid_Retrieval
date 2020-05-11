@@ -23,7 +23,7 @@ import random
 
 class BertSQuADRetriever(nn.Module):
     def __init__(self, n_neg_sample, device):
-        super(BertSQuADRetriever).__init__()
+        super(BertSQuADRetriever, self).__init__()
 
         self.bert_q = BertModel.from_pretrained('bert-base-uncased')
         self.bert_d = BertModel.from_pretrained('bert-base-uncased')
