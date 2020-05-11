@@ -4,7 +4,7 @@ import argparse
 
 parent_folder_path = str(Path('.').absolute().parent)
 datasets_folder_path = parent_folder_path+"/datasets/"
-sys.path+=[parent_folder_path]
+sys.path+=[parent_folder_path, datasets_folder_path]
 
 import torch
 import torch.nn as nn
