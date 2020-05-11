@@ -383,12 +383,12 @@ class PadCollateSQuADTrain:
         max_len_fact = max([len(fact_token_ids) for fact_token_ids in all_facts_ids])
 
         for i, fact_ids in enumerate(all_facts_ids):
-            all_facts_ids[i]  = self._pad_tensor(fact_ids, pad=max_len_fact)[:min(510, max_len_fact)]   # truncate the facts to maximum 512 tokens.
+            all_facts_ids[i]  = self._pad_tensor(fact_ids, pad=max_len_fact)[:min(254, max_len_fact)]   # truncate the facts to maximum 512 tokens.
         # stack all
 
         # the output of this function needs to be a already batched function.
         batch_returned["fact_token_ids"] = torch.tensor([[101]+fact_ids+[102] for fact_ids in all_facts_ids])
-        batch_returned["fact_seg_ids"] = torch.tensor([[0]*min(max_len_fact+2, 512) for fact_ids in all_facts_ids])
+        batch_returned["fact_seg_ids"] = torch.tensor([[0]*min(max_len_fact+2, 256) for fact_ids in all_facts_ids])
 
         batch_returned["label_in_distractor"] = torch.tensor([sample["label_in_distractor"] for sample in batch])
 
@@ -521,12 +521,12 @@ class PadCollateSQuADEvalFact:
         max_len_fact = max([len(sample["fact_token_ids"]) for sample in batch])
 
         for sample in batch:
-            all_facts_ids.append(self._pad_tensor(sample["fact_token_ids"], pad=max_len_fact)[:min(510, max_len_fact)])
+            all_facts_ids.append(self._pad_tensor(sample["fact_token_ids"], pad=max_len_fact)[:min(254, max_len_fact)])
         # stack all
 
         # the output of this function needs to be a already batched function.
         batch_returned["fact_token_ids"] = torch.tensor([[101]+fact_ids+[102] for fact_ids in all_facts_ids])
-        batch_returned["fact_seg_ids"] = torch.tensor([[0]*min(max_len_fact+2, 512) for fact_ids in all_facts_ids])
+        batch_returned["fact_seg_ids"] = torch.tensor([[0]*min(max_len_fact+2, 256) for fact_ids in all_facts_ids])
 
         return batch_returned
 

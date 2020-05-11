@@ -82,6 +82,9 @@ class BertSQuADRetriever(nn.Module):
 
             total_loss += loss.detach().cpu().numpy()
 
+            if (i+1)%10==0:
+                print("\t\tprocessing sample "+str(i)+" ...")
+
         return total_loss/len(squad_retrieval_train_dataloader)
 
 
@@ -212,6 +215,8 @@ def train_and_eval_model(args, saved_pickle_path = parent_folder_path + "/data_g
     best_mrr = 0
     main_result_array = np.zeros((N_EPOCH, 3))
     for epoch in range(N_EPOCH):
+        print("="*20)
+        print("Epoch ", epoch+1)
         train_loss = bert_retriever.train_epoch(optimizer, squad_retrieval_train_dataloader)
         dev_result_dict, test_result_dict = bert_retriever.eval_epoch(squad_retrieval_dev_dataloader, squad_retrieval_test_dataloader, squad_retrieval_eval_fact_dataloader)
 
@@ -243,11 +248,12 @@ def main():
 
     parser.add_argument("--device", type=str, default="cpu")
     parser.add_argument("--seed", type=int, default=0)
-    parser.add_argument("--batch_size", type=int, default=5)
+    parser.add_argument("--batch_size", type=int, default=1)
     parser.add_argument("--n_epoch", type=int, default=4)
     parser.add_argument("--n_worker", type=int, default=3)
     parser.add_argument("--n_neg_sample", type=int, default=5)
     parser.add_argument("--num_dev", type=int, default=2000)
+    parser.add_argument("--max_seq_len", type = int, default = 256)
 
     # parse the input arguments
     args = parser.parse_args()
