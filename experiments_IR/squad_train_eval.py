@@ -68,6 +68,8 @@ class BertSQuADRetriever(nn.Module):
         total_loss = 0
         start_time = time.time()
         for i, batch in enumerate(squad_retrieval_train_dataloader):
+            optimizer.zero_grad()
+
             query_output_tensor, fact_output_tensor = self.forward_train(batch["query_token_ids"].to(self.device),
                                                                  batch["query_seg_ids"].to(self.device),
                                                                  batch["fact_token_ids"].to(self.device),
@@ -87,9 +89,6 @@ class BertSQuADRetriever(nn.Module):
             if (i+1)%50==0:
                 print("\t\tprocessing batch "+str(i+1)+" ... , batch time:"+str(time.time()-start_time)+ " avg loss:"+str(total_loss/(i+1)))
                 start_time = time.time()
-
-                if i>30:  # TODO: remember to remove this later.
-                    break
 
         return total_loss/len(squad_retrieval_train_dataloader)
 
@@ -113,28 +112,29 @@ class BertSQuADRetriever(nn.Module):
         # the best performed model (model with the best test mrr).
         # training loss, dev mrr, test mrr.
 
-        # First step: compute all fact embeddings
-        fact_embds = []
-        for i, batch in enumerate(squad_retrieval_eval_fact_dataloader):
-            fact_embds_batch = self.forward_eval_fact(batch["fact_token_ids"].to(self.device), batch["fact_seg_ids"].to(self.device))
-            fact_embds.append(fact_embds_batch.detach().cpu().numpy())
-        fact_embds = np.transpose(np.concatenate(fact_embds, axis = 0))  # transpose the embedding for better multiplication.
+        with torch.no_grad():
+            # First step: compute all fact embeddings
+            fact_embds = []
+            for i, batch in enumerate(squad_retrieval_eval_fact_dataloader):
+                fact_embds_batch = self.forward_eval_fact(batch["fact_token_ids"].to(self.device), batch["fact_seg_ids"].to(self.device))
+                fact_embds.append(fact_embds_batch.detach().cpu().numpy())
+            fact_embds = np.transpose(np.concatenate(fact_embds, axis = 0))  # transpose the embedding for better multiplication.
 
-        # Second step: compute the query embedding for each batch. At the same time return the needed results.
-        dev_results_dict = {"mrr": [], "gold_fact_index": [], "gold_fact_ranking": [], "gold_fact_score": [], "top_64_facts":[], "top_64_scores":[]}
-        for i, batch in enumerate(squad_retrieval_dev_dataloader):
-            query_embds_batch = self.forward_eval_query(batch["query_token_ids"].to(self.device),batch["query_seg_ids"].to(self.device))
-            query_embds_batch = query_embds_batch.detach().cpu().numpy()
+            # Second step: compute the query embedding for each batch. At the same time return the needed results.
+            dev_results_dict = {"mrr": [], "gold_fact_index": [], "gold_fact_ranking": [], "gold_fact_score": [], "top_64_facts":[], "top_64_scores":[]}
+            for i, batch in enumerate(squad_retrieval_dev_dataloader):
+                query_embds_batch = self.forward_eval_query(batch["query_token_ids"].to(self.device),batch["query_seg_ids"].to(self.device))
+                query_embds_batch = query_embds_batch.detach().cpu().numpy()
 
-            self._fill_results_dict(batch, query_embds_batch, fact_embds, dev_results_dict)
+                self._fill_results_dict(batch, query_embds_batch, fact_embds, dev_results_dict)
 
-        # Third step: compute the query embedding for each batch, then store the result to a dict.
-        test_results_dict = {"mrr": [], "gold_fact_index": [], "gold_fact_ranking": [], "gold_fact_score": [], "top_64_facts":[], "top_64_scores":[]}
-        for i, batch in enumerate(squad_retrieval_test_dataloader):
-            query_embds_batch = self.forward_eval_query(batch["query_token_ids"].to(self.device), batch["query_seg_ids"].to(self.device))
-            query_embds_batch = query_embds_batch.detach().cpu().numpy()
+            # Third step: compute the query embedding for each batch, then store the result to a dict.
+            test_results_dict = {"mrr": [], "gold_fact_index": [], "gold_fact_ranking": [], "gold_fact_score": [], "top_64_facts":[], "top_64_scores":[]}
+            for i, batch in enumerate(squad_retrieval_test_dataloader):
+                query_embds_batch = self.forward_eval_query(batch["query_token_ids"].to(self.device), batch["query_seg_ids"].to(self.device))
+                query_embds_batch = query_embds_batch.detach().cpu().numpy()
 
-            self._fill_results_dict(batch, query_embds_batch, fact_embds, test_results_dict)
+                self._fill_results_dict(batch, query_embds_batch, fact_embds, test_results_dict)
 
         return dev_results_dict, test_results_dict
 
