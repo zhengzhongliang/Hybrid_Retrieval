@@ -158,7 +158,7 @@ class BertSQuADRetriever(nn.Module):
 
     def _fill_results_dict(self, batch, query_embds_batch, fact_embds, result_dict):
         # Things to return:
-        gold_facts_indices = batch["response"].numpy().reshape((len(self.batch_size_eval), 1))  # size: n_query * 1
+        gold_facts_indices = batch["response"].numpy().reshape((self.batch_size_eval, 1))  # size: n_query * 1
 
         batch_scores = softmax(np.matmul(query_embds_batch, fact_embds))   # size: n_query * n_facts
         sorted_scores = np.flip(np.sort(batch_scores, axis=1), axis = 1)
