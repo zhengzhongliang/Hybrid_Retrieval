@@ -242,7 +242,7 @@ def train_and_eval_model(args, saved_pickle_path = parent_folder_path + "/data_g
     save_folder_path = parent_folder_path+'/data_generated/squad_retrieval_seed_' + str(args.seed) + "_" + date_time+"/"
 
     if not os.path.exists(save_folder_path):
-        os.mkdir(save_folder_path)
+        os.makedirs(save_folder_path)
 
     # Start evaluation.
     best_mrr = 0
