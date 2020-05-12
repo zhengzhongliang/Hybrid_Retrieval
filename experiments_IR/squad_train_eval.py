@@ -132,6 +132,7 @@ class BertSQuADRetriever(nn.Module):
             #     if (i+1)%100==0:
             #         print("\tget fact "+str(i+1))
             # fact_embds = np.transpose(np.concatenate(fact_embds, axis = 0))  # transpose the embedding for better multiplication.
+            #
             fact_embds = np.random.rand(768, 102000)
 
             # Second step: compute the query embedding for each batch. At the same time return the needed results.
@@ -179,6 +180,8 @@ class BertSQuADRetriever(nn.Module):
         return 0
 
 def train_and_eval_model(args, saved_pickle_path = parent_folder_path + "/data_generated/squad_retrieval_data_seed_0_dev_2000.pickle"):
+    # TODO: later think about a way to pass this folder directory in a clever way.
+
     N_EPOCH = args.n_epoch
     BATCH_SIZE_TRAIN = args.batch_size_train
     BATCH_SIZE_EVAL = args.batch_size_eval
@@ -260,15 +263,15 @@ def train_and_eval_model(args, saved_pickle_path = parent_folder_path + "/data_g
 
         if dev_mrr > best_mrr:
 
-            torch.save(bert_retriever, save_folder_path+"saved_bert_retriever_epoch_"+str(epoch))  # TODO: fix the folder path, and save the dev and test dict
+            torch.save(bert_retriever, save_folder_path+"saved_bert_retriever")
 
-            with open(save_folder_path+"dev_dict_epoch_"+str(epoch)+".pickle", "wb") as handle:
+            with open(save_folder_path+"dev_dict.pickle", "wb") as handle:
                 pickle.dump(dev_result_dict, handle)
 
-            with open(save_folder_path+"test_dict_epoch_"+str(epoch)+".pickle", "wb") as handle:
+            with open(save_folder_path+"test_dict.pickle", "wb") as handle:
                 pickle.dump(test_result_dict, handle)
 
-    np.save(save_folder_path+"main_result_"+str(args.seed)+".npy", main_result_array)
+    np.save(save_folder_path+"main_result.npy", main_result_array)
 
     return 0
 
@@ -287,8 +290,6 @@ def main():
     parser.add_argument("--n_neg_sample", type=int, default=4)
     parser.add_argument("--num_dev", type=int, default=2000)
     parser.add_argument("--max_seq_len", type = int, default = 256)  # TODO: think about a way to pass this value to the collate function.
-
-    # TODO: maybe should use different batch size at training or testing.
 
     # parse the input arguments
     args = parser.parse_args()
