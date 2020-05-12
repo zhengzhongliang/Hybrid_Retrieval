@@ -18,6 +18,7 @@ import time
 
 import squad_retrieval
 import random
+import datetime
 
 # TODO: maybe later move this function to another module
 def softmax(x):
@@ -178,13 +179,14 @@ class BertSQuADRetriever(nn.Module):
 
 def train_and_eval_model(args, saved_pickle_path = parent_folder_path + "/data_generated/squad_retrieval_data_seed_0_dev_2000.pickle"):
     N_EPOCH = args.n_epoch
-    BATCH_SIZE = args.batch_size
+    BATCH_SIZE_TRAIN = args.batch_size_train
+    BATCH_SIZE_EVAL = args.batch_size_eval
     NUM_WORKERS = args.n_worker
     N_NEG_FACT = args.n_neg_sample
     DEVICE = torch.device(args.device) if torch.cuda.is_available() else torch.device("cpu")
 
     # Instantiate BERT retriever, optimizer and tokenizer.
-    bert_retriever = BertSQuADRetriever(N_NEG_FACT, DEVICE, BATCH_SIZE, BATCH_SIZE)
+    bert_retriever = BertSQuADRetriever(N_NEG_FACT, DEVICE, BATCH_SIZE_TRAIN, BATCH_SIZE_EVAL)
     bert_retriever.to(DEVICE)
 
     tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
@@ -202,7 +204,7 @@ def train_and_eval_model(args, saved_pickle_path = parent_folder_path + "/data_g
                                                                random_seed=args.seed,
                                                                 n_negative_sample = N_NEG_FACT)
 
-    squad_retrieval_train_dataloader = DataLoader(squad_retrieval_train_dataset, batch_size=BATCH_SIZE,
+    squad_retrieval_train_dataloader = DataLoader(squad_retrieval_train_dataset, batch_size=BATCH_SIZE_TRAIN,
                                                   shuffle=True, num_workers=NUM_WORKERS, collate_fn=squad_retrieval.PadCollateSQuADTrain())
 
     squad_retrieval_dev_dataset = squad_retrieval.SQuADRetrievalDatasetEvalQuery(instance_list=squad_retrieval_data["dev_list"][:200],
@@ -211,7 +213,7 @@ def train_and_eval_model(args, saved_pickle_path = parent_folder_path + "/data_g
                                                                  resp_list=squad_retrieval_data["resp_list"],
                                                                  tokenizer=tokenizer)
 
-    squad_retrieval_dev_dataloader = DataLoader(squad_retrieval_dev_dataset, batch_size=BATCH_SIZE,
+    squad_retrieval_dev_dataloader = DataLoader(squad_retrieval_dev_dataset, batch_size=BATCH_SIZE_EVAL,
                                                 shuffle=False, num_workers=NUM_WORKERS, collate_fn=squad_retrieval.PadCollateSQuADEvalQuery())
 
     squad_retrieval_test_dataset = squad_retrieval.SQuADRetrievalDatasetEvalQuery(instance_list=squad_retrieval_data["test_list"][:200],
@@ -220,7 +222,7 @@ def train_and_eval_model(args, saved_pickle_path = parent_folder_path + "/data_g
                                                                   resp_list=squad_retrieval_data["resp_list"],
                                                                   tokenizer=tokenizer)
 
-    squad_retrieval_test_dataloader = DataLoader(squad_retrieval_test_dataset, batch_size=BATCH_SIZE,
+    squad_retrieval_test_dataloader = DataLoader(squad_retrieval_test_dataset, batch_size=BATCH_SIZE_EVAL,
                                                  shuffle=False, num_workers=NUM_WORKERS, collate_fn=squad_retrieval.PadCollateSQuADEvalQuery())
 
     squad_retrieval_eval_fact_dataset = squad_retrieval.SQuADRetrievalDatasetEvalFact(instance_list=squad_retrieval_data["resp_list"],
@@ -229,11 +231,14 @@ def train_and_eval_model(args, saved_pickle_path = parent_folder_path + "/data_g
                                                                       resp_list=squad_retrieval_data["resp_list"],
                                                                       tokenizer=tokenizer)
 
-    squad_retrieval_eval_fact_dataloader = DataLoader(squad_retrieval_eval_fact_dataset, batch_size=BATCH_SIZE,
+    squad_retrieval_eval_fact_dataloader = DataLoader(squad_retrieval_eval_fact_dataset, batch_size=BATCH_SIZE_EVAL,
                                                       shuffle=False, num_workers=NUM_WORKERS,
                                                       collate_fn=squad_retrieval.PadCollateSQuADEvalFact())
 
     # TODO: save foler path. If no folder is found, make directory.
+    now = datetime.datetime.now()
+    date_time = str(now)[:10] + '_' + str(now)[11:13] + str(now)[14:16]
+    save_folder_path = 'data_generated/squad_retrieval_seed_' + str(args.seed) + "_" + date_time
 
     # Start evaluation.
     best_mrr = 0
@@ -251,16 +256,15 @@ def train_and_eval_model(args, saved_pickle_path = parent_folder_path + "/data_g
 
         if dev_mrr > best_mrr:
 
-            torch.save(bert_retriever, "data_generated/saved_bert_retriever_seed_"+str(args.seed))  # TODO: fix the folder path, and save the dev and test dict
+            torch.save(bert_retriever, save_folder_path+"/saved_bert_retriever_epoch_"+str(epoch))  # TODO: fix the folder path, and save the dev and test dict
 
-            with open("data_generated/dev_dict_"+str(args.seed)+".pickle", "wb") as handle:
+            with open(save_folder_path+"/dev_dict_epoch_"+str(epoch)+".pickle", "wb") as handle:
                 pickle.dump(dev_result_dict, handle)
 
-            with open("data_generated/test_dict_"+str(args.seed)+".pickle", "wb") as handle:
+            with open(save_folder_path+"/test_dict_epoch_"+str(epoch)+".pickle", "wb") as handle:
                 pickle.dump(test_result_dict, handle)
 
-    # TODO: save the main result array
-    np.save("data_generated/main_result_"+str(args.seed)+".npy", main_result_array)
+    np.save(save_folder_path+"/main_result_"+str(args.seed)+".npy", main_result_array)
 
     return 0
 
@@ -272,7 +276,8 @@ def main():
 
     parser.add_argument("--device", type=str, default="cuda:0")
     parser.add_argument("--seed", type=int, default=0)
-    parser.add_argument("--batch_size", type=int, default=1)  # batch size will indeed affact this. Larger batch size will cause out of memory issue
+    parser.add_argument("--batch_size_train", type=int, default=1)  # batch size will indeed affact this. Larger batch size will cause out of memory issue
+    parser.add_argument("--batch_size_eval", type=int, default=4)
     parser.add_argument("--n_epoch", type=int, default=4)
     parser.add_argument("--n_worker", type=int, default=3)
     parser.add_argument("--n_neg_sample", type=int, default=4)
