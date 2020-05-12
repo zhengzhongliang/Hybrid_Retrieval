@@ -300,8 +300,12 @@ def main():
 
     torch.set_num_threads(1) # this has nothing to do with dataloader num worker
 
-    train_and_eval_model(args)
+    print("="*20)
+    print("args:", args)
+    print("num thread:", torch.get_num_threads())
+    print("="*20)
 
+    train_and_eval_model(args)
 
     return 0
 
