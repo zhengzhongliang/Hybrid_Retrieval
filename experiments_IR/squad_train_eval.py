@@ -19,6 +19,7 @@ import time
 import squad_retrieval
 import random
 import datetime
+import os
 
 # TODO: maybe later move this function to another module
 def softmax(x):
@@ -239,6 +240,9 @@ def train_and_eval_model(args, saved_pickle_path = parent_folder_path + "/data_g
     now = datetime.datetime.now()
     date_time = str(now)[:10] + '_' + str(now)[11:13] + str(now)[14:16]
     save_folder_path = 'data_generated/squad_retrieval_seed_' + str(args.seed) + "_" + date_time
+
+    if not os.path.exists(save_folder_path):
+        os.mkdir(save_folder_path)
 
     # Start evaluation.
     best_mrr = 0
