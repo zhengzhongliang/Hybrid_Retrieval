@@ -298,6 +298,8 @@ def main():
     # #This python random library is used in two places: one is constructing the raw dataset, the other is when constructing train data.
     np.random.seed(args.seed)   # set numpy seed
 
+    torch.set_num_threads(1) # this has nothing to do with dataloader num worker
+
     train_and_eval_model(args)
 
 
