@@ -239,7 +239,7 @@ def train_and_eval_model(args, saved_pickle_path = parent_folder_path + "/data_g
     # TODO: save foler path. If no folder is found, make directory.
     now = datetime.datetime.now()
     date_time = str(now)[:10] + '_' + str(now)[11:13] + str(now)[14:16]
-    save_folder_path = 'data_generated/squad_retrieval_seed_' + str(args.seed) + "_" + date_time
+    save_folder_path = parent_folder_path+'/data_generated/squad_retrieval_seed_' + str(args.seed) + "_" + date_time+"/"
 
     if not os.path.exists(save_folder_path):
         os.mkdir(save_folder_path)
@@ -260,15 +260,15 @@ def train_and_eval_model(args, saved_pickle_path = parent_folder_path + "/data_g
 
         if dev_mrr > best_mrr:
 
-            torch.save(bert_retriever, save_folder_path+"/saved_bert_retriever_epoch_"+str(epoch))  # TODO: fix the folder path, and save the dev and test dict
+            torch.save(bert_retriever, save_folder_path+"saved_bert_retriever_epoch_"+str(epoch))  # TODO: fix the folder path, and save the dev and test dict
 
-            with open(save_folder_path+"/dev_dict_epoch_"+str(epoch)+".pickle", "wb") as handle:
+            with open(save_folder_path+"dev_dict_epoch_"+str(epoch)+".pickle", "wb") as handle:
                 pickle.dump(dev_result_dict, handle)
 
-            with open(save_folder_path+"/test_dict_epoch_"+str(epoch)+".pickle", "wb") as handle:
+            with open(save_folder_path+"test_dict_epoch_"+str(epoch)+".pickle", "wb") as handle:
                 pickle.dump(test_result_dict, handle)
 
-    np.save(save_folder_path+"/main_result_"+str(args.seed)+".npy", main_result_array)
+    np.save(save_folder_path+"main_result_"+str(args.seed)+".npy", main_result_array)
 
     return 0
 
