@@ -125,6 +125,8 @@ class BertSQuADRetriever(nn.Module):
             for i, batch in enumerate(squad_retrieval_eval_fact_dataloader):
                 fact_embds_batch = self.forward_eval_fact(batch["fact_token_ids"].to(self.device), batch["fact_seg_ids"].to(self.device))
                 fact_embds.append(fact_embds_batch.detach().cpu().numpy())
+                if (i+1)%100==0:
+                    print("\tget fact "+str(i+1))
             fact_embds = np.transpose(np.concatenate(fact_embds, axis = 0))  # transpose the embedding for better multiplication.
 
             # Second step: compute the query embedding for each batch. At the same time return the needed results.
@@ -135,6 +137,9 @@ class BertSQuADRetriever(nn.Module):
 
                 self._fill_results_dict(batch, query_embds_batch, fact_embds, dev_results_dict)
 
+                if (i+1)%100==0:
+                    print("\tget dev query "+str(i+1))
+
             # Third step: compute the query embedding for each batch, then store the result to a dict.
             test_results_dict = {"mrr": [], "gold_fact_index": [], "gold_fact_ranking": [], "gold_fact_score": [], "top_64_facts":[], "top_64_scores":[]}
             for i, batch in enumerate(squad_retrieval_test_dataloader):
@@ -142,6 +147,9 @@ class BertSQuADRetriever(nn.Module):
                 query_embds_batch = query_embds_batch.detach().cpu().numpy()
 
                 self._fill_results_dict(batch, query_embds_batch, fact_embds, test_results_dict)
+
+                if (i+1)%100==0:
+                    print("\tget test query "+str(i+1))
 
         return dev_results_dict, test_results_dict
 
@@ -183,7 +191,7 @@ def train_and_eval_model(args, saved_pickle_path = parent_folder_path + "/data_g
     # Load SQuAD dataset and dataloader.
     squad_retrieval_data = squad_retrieval.convert_squad_to_retrieval(tokenizer, random_seed = args.seed, num_dev = args.num_dev)
 
-    squad_retrieval_train_dataset = squad_retrieval.SQuADRetrievalDatasetTrain(instance_list=squad_retrieval_data["train_list"][:500],
+    squad_retrieval_train_dataset = squad_retrieval.SQuADRetrievalDatasetTrain(instance_list=squad_retrieval_data["train_list"][:200],
                                                                sent_list=squad_retrieval_data["sent_list"],
                                                                doc_list=squad_retrieval_data["doc_list"],
                                                                resp_list=squad_retrieval_data["resp_list"],
@@ -194,7 +202,7 @@ def train_and_eval_model(args, saved_pickle_path = parent_folder_path + "/data_g
     squad_retrieval_train_dataloader = DataLoader(squad_retrieval_train_dataset, batch_size=BATCH_SIZE,
                                                   shuffle=True, num_workers=NUM_WORKERS, collate_fn=squad_retrieval.PadCollateSQuADTrain())
 
-    squad_retrieval_dev_dataset = squad_retrieval.SQuADRetrievalDatasetEvalQuery(instance_list=squad_retrieval_data["dev_list"][:500],
+    squad_retrieval_dev_dataset = squad_retrieval.SQuADRetrievalDatasetEvalQuery(instance_list=squad_retrieval_data["dev_list"][:200],
                                                                  sent_list=squad_retrieval_data["sent_list"],
                                                                  doc_list=squad_retrieval_data["doc_list"],
                                                                  resp_list=squad_retrieval_data["resp_list"],
@@ -203,7 +211,7 @@ def train_and_eval_model(args, saved_pickle_path = parent_folder_path + "/data_g
     squad_retrieval_dev_dataloader = DataLoader(squad_retrieval_dev_dataset, batch_size=BATCH_SIZE,
                                                 shuffle=False, num_workers=NUM_WORKERS, collate_fn=squad_retrieval.PadCollateSQuADEvalQuery())
 
-    squad_retrieval_test_dataset = squad_retrieval.SQuADRetrievalDatasetEvalQuery(instance_list=squad_retrieval_data["test_list"][:500],
+    squad_retrieval_test_dataset = squad_retrieval.SQuADRetrievalDatasetEvalQuery(instance_list=squad_retrieval_data["test_list"][:200],
                                                                   sent_list=squad_retrieval_data["sent_list"],
                                                                   doc_list=squad_retrieval_data["doc_list"],
                                                                   resp_list=squad_retrieval_data["resp_list"],
