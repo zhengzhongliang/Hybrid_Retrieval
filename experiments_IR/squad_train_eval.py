@@ -169,7 +169,7 @@ class BertSQuADRetriever(nn.Module):
         result_dict["gold_fact_index"].extend(gold_facts_indices.flatten().tolist())
         result_dict["gold_fact_ranking"].extend(gold_fact_rankings.tolist())   # get the gold fact ranking of each query
         result_dict["gold_fact_score"].extend(sorted_scores[ gold_fact_rankings_indices_row,  gold_fact_rankings].tolist())
-        result_dict["mrr"].extend(1/(1+gold_fact_rankings).tolist())
+        result_dict["mrr"].extend((1/(1+gold_fact_rankings)).tolist())
 
         result_dict["top_64_facts"].extend(sorted_facts[:,:64].tolist())
         result_dict["top_64_scores"].extend(sorted_scores[:,:64].tolist())
