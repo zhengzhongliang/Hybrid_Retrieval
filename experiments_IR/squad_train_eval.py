@@ -261,7 +261,7 @@ def main():
 
     parser.add_argument("--device", type=str, default="cuda:0")
     parser.add_argument("--seed", type=int, default=0)
-    parser.add_argument("--batch_size", type=int, default=2)
+    parser.add_argument("--batch_size", type=int, default=1)  # batch size will indeed affact this. Larger batch size will cause out of memory issue
     parser.add_argument("--n_epoch", type=int, default=4)
     parser.add_argument("--n_worker", type=int, default=3)
     parser.add_argument("--n_neg_sample", type=int, default=4)
