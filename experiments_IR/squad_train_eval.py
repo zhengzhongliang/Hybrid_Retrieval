@@ -19,6 +19,10 @@ import time
 import squad_retrieval
 import random
 
+# TODO: maybe later move this function to another module
+def softmax(x):
+    return np.exp(x) / np.sum(np.exp(x), axis=1, keepdims=True)
+
 # TODO: print essential information.
 
 
@@ -64,6 +68,7 @@ class BertSQuADRetriever(nn.Module):
         return fact_output_tensor
 
     def train_epoch(self, optimizer, squad_retrieval_train_dataloader):
+        self.train()
 
         total_loss = 0
         start_time = time.time()
@@ -112,6 +117,8 @@ class BertSQuADRetriever(nn.Module):
         # the best performed model (model with the best test mrr).
         # training loss, dev mrr, test mrr.
 
+        self.eval()
+
         with torch.no_grad():
             # First step: compute all fact embeddings
             fact_embds = []
@@ -142,7 +149,7 @@ class BertSQuADRetriever(nn.Module):
         # Things to return:
         gold_facts_indices = batch["response"].numpy().reshape((len(batch), 1))  # size: n_query * 1
 
-        batch_scores = np.matmul(query_embds_batch, fact_embds)   # size: n_query * n_facts  TODO: this needs to be after softmaxed.
+        batch_scores = softmax(np.matmul(query_embds_batch, fact_embds))   # size: n_query * n_facts
         sorted_scores = np.flip(np.sort(batch_scores, axis=1), axis = 1)
         sorted_facts = np.flip(np.argsort(batch_scores, axis=1), axis= 1)
 
@@ -176,7 +183,7 @@ def train_and_eval_model(args, saved_pickle_path = parent_folder_path + "/data_g
     # Load SQuAD dataset and dataloader.
     squad_retrieval_data = squad_retrieval.convert_squad_to_retrieval(tokenizer, random_seed = args.seed, num_dev = args.num_dev)
 
-    squad_retrieval_train_dataset = squad_retrieval.SQuADRetrievalDatasetTrain(instance_list=squad_retrieval_data["train_list"],
+    squad_retrieval_train_dataset = squad_retrieval.SQuADRetrievalDatasetTrain(instance_list=squad_retrieval_data["train_list"][:500],
                                                                sent_list=squad_retrieval_data["sent_list"],
                                                                doc_list=squad_retrieval_data["doc_list"],
                                                                resp_list=squad_retrieval_data["resp_list"],
@@ -187,7 +194,7 @@ def train_and_eval_model(args, saved_pickle_path = parent_folder_path + "/data_g
     squad_retrieval_train_dataloader = DataLoader(squad_retrieval_train_dataset, batch_size=BATCH_SIZE,
                                                   shuffle=True, num_workers=NUM_WORKERS, collate_fn=squad_retrieval.PadCollateSQuADTrain())
 
-    squad_retrieval_dev_dataset = squad_retrieval.SQuADRetrievalDatasetEvalQuery(instance_list=squad_retrieval_data["dev_list"],
+    squad_retrieval_dev_dataset = squad_retrieval.SQuADRetrievalDatasetEvalQuery(instance_list=squad_retrieval_data["dev_list"][:500],
                                                                  sent_list=squad_retrieval_data["sent_list"],
                                                                  doc_list=squad_retrieval_data["doc_list"],
                                                                  resp_list=squad_retrieval_data["resp_list"],
@@ -196,7 +203,7 @@ def train_and_eval_model(args, saved_pickle_path = parent_folder_path + "/data_g
     squad_retrieval_dev_dataloader = DataLoader(squad_retrieval_dev_dataset, batch_size=BATCH_SIZE,
                                                 shuffle=False, num_workers=NUM_WORKERS, collate_fn=squad_retrieval.PadCollateSQuADEvalQuery())
 
-    squad_retrieval_test_dataset = squad_retrieval.SQuADRetrievalDatasetEvalQuery(instance_list=squad_retrieval_data["test_list"],
+    squad_retrieval_test_dataset = squad_retrieval.SQuADRetrievalDatasetEvalQuery(instance_list=squad_retrieval_data["test_list"][:500],
                                                                   sent_list=squad_retrieval_data["sent_list"],
                                                                   doc_list=squad_retrieval_data["doc_list"],
                                                                   resp_list=squad_retrieval_data["resp_list"],
@@ -254,12 +261,14 @@ def main():
 
     parser.add_argument("--device", type=str, default="cuda:0")
     parser.add_argument("--seed", type=int, default=0)
-    parser.add_argument("--batch_size", type=int, default=1)
+    parser.add_argument("--batch_size", type=int, default=2)
     parser.add_argument("--n_epoch", type=int, default=4)
     parser.add_argument("--n_worker", type=int, default=3)
-    parser.add_argument("--n_neg_sample", type=int, default=5)
+    parser.add_argument("--n_neg_sample", type=int, default=4)
     parser.add_argument("--num_dev", type=int, default=2000)
     parser.add_argument("--max_seq_len", type = int, default = 256)  # TODO: think about a way to pass this value to the collate function.
+
+    # TODO: maybe should use different batch size at training or testing.
 
     # parse the input arguments
     args = parser.parse_args()
