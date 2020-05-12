@@ -14,6 +14,7 @@ import torch.optim as optim
 
 import pickle
 import numpy as np
+import time
 
 import squad_retrieval
 import random
@@ -65,6 +66,7 @@ class BertSQuADRetriever(nn.Module):
     def train_epoch(self, optimizer, squad_retrieval_train_dataloader):
 
         total_loss = 0
+        start_time = time.time()
         for i, batch in enumerate(squad_retrieval_train_dataloader):
             query_output_tensor, fact_output_tensor = self.forward_train(batch["query_token_ids"].to(self.device),
                                                                  batch["query_seg_ids"].to(self.device),
@@ -82,8 +84,12 @@ class BertSQuADRetriever(nn.Module):
 
             total_loss += loss.detach().cpu().numpy()
 
-            if (i+1)%10==0:
-                print("\t\tprocessing sample "+str(i)+" ...")
+            if (i+1)%50==0:
+                print("\t\tprocessing batch "+str(i+1)+" ... , batch time:"+str(time.time()-start_time)+ " avg loss:"+str(total_loss/(i+1)))
+                start_time = time.time()
+
+                if i>30:  # TODO: remember to remove this later.
+                    break
 
         return total_loss/len(squad_retrieval_train_dataloader)
 
@@ -253,7 +259,7 @@ def main():
     parser.add_argument("--n_worker", type=int, default=3)
     parser.add_argument("--n_neg_sample", type=int, default=5)
     parser.add_argument("--num_dev", type=int, default=2000)
-    parser.add_argument("--max_seq_len", type = int, default = 256)
+    parser.add_argument("--max_seq_len", type = int, default = 256)  # TODO: think about a way to pass this value to the collate function.
 
     # parse the input arguments
     args = parser.parse_args()
