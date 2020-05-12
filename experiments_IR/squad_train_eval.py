@@ -27,7 +27,7 @@ def softmax(x):
 
 
 class BertSQuADRetriever(nn.Module):
-    def __init__(self, n_neg_sample, device):
+    def __init__(self, n_neg_sample, device, batch_size_train, batch_size_eval):
         super(BertSQuADRetriever, self).__init__()
 
         self.bert_q = BertModel.from_pretrained('bert-base-uncased')
@@ -37,6 +37,8 @@ class BertSQuADRetriever(nn.Module):
 
         self.n_neg_sample = n_neg_sample
         self.device = device
+        self.batch_size_train = batch_size_train
+        self.batch_size_eval = batch_size_eval
 
     def forward_train(self, query_token_ids, query_seg_ids, fact_token_ids, fact_seg_ids):
         query_output_tensor_, _ = self.bert_q(query_token_ids, query_seg_ids)
@@ -121,13 +123,14 @@ class BertSQuADRetriever(nn.Module):
 
         with torch.no_grad():
             # First step: compute all fact embeddings
-            fact_embds = []
-            for i, batch in enumerate(squad_retrieval_eval_fact_dataloader):
-                fact_embds_batch = self.forward_eval_fact(batch["fact_token_ids"].to(self.device), batch["fact_seg_ids"].to(self.device))
-                fact_embds.append(fact_embds_batch.detach().cpu().numpy())
-                if (i+1)%100==0:
-                    print("\tget fact "+str(i+1))
-            fact_embds = np.transpose(np.concatenate(fact_embds, axis = 0))  # transpose the embedding for better multiplication.
+            # fact_embds = []
+            # for i, batch in enumerate(squad_retrieval_eval_fact_dataloader):
+            #     fact_embds_batch = self.forward_eval_fact(batch["fact_token_ids"].to(self.device), batch["fact_seg_ids"].to(self.device))
+            #     fact_embds.append(fact_embds_batch.detach().cpu().numpy())
+            #     if (i+1)%100==0:
+            #         print("\tget fact "+str(i+1))
+            # fact_embds = np.transpose(np.concatenate(fact_embds, axis = 0))  # transpose the embedding for better multiplication.
+            fact_embds = np.random.rand(768, 102000)
 
             # Second step: compute the query embedding for each batch. At the same time return the needed results.
             dev_results_dict = {"mrr": [], "gold_fact_index": [], "gold_fact_ranking": [], "gold_fact_score": [], "top_64_facts":[], "top_64_scores":[]}
@@ -155,7 +158,7 @@ class BertSQuADRetriever(nn.Module):
 
     def _fill_results_dict(self, batch, query_embds_batch, fact_embds, result_dict):
         # Things to return:
-        gold_facts_indices = batch["response"].numpy().reshape((len(batch), 1))  # size: n_query * 1
+        gold_facts_indices = batch["response"].numpy().reshape((len(self.batch_size_eval), 1))  # size: n_query * 1
 
         batch_scores = softmax(np.matmul(query_embds_batch, fact_embds))   # size: n_query * n_facts
         sorted_scores = np.flip(np.sort(batch_scores, axis=1), axis = 1)
@@ -181,7 +184,7 @@ def train_and_eval_model(args, saved_pickle_path = parent_folder_path + "/data_g
     DEVICE = torch.device(args.device) if torch.cuda.is_available() else torch.device("cpu")
 
     # Instantiate BERT retriever, optimizer and tokenizer.
-    bert_retriever = BertSQuADRetriever(N_NEG_FACT, DEVICE)
+    bert_retriever = BertSQuADRetriever(N_NEG_FACT, DEVICE, BATCH_SIZE, BATCH_SIZE)
     bert_retriever.to(DEVICE)
 
     tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
