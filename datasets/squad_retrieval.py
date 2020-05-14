@@ -360,7 +360,7 @@ class PadCollateSQuADTrain:
         """
 
     def _pad_tensor(self, vec, pad):
-        return vec + [0] * (pad - len(vec))
+        return vec + [103] * (pad - len(vec))
 
     def pad_collate(self, batch):
         # The input here is actually a list of dictionary.
@@ -455,7 +455,7 @@ class PadCollateSQuADEvalQuery:
         Nothing to add here
         """
     def _pad_tensor(self, vec, pad):
-        return vec + [0] * (pad - len(vec))
+        return vec + [103] * (pad - len(vec))
 
     def pad_collate(self, batch):
         # The input here is actually a list of dictionary.
@@ -510,7 +510,7 @@ class PadCollateSQuADEvalFact:
         """
 
     def _pad_tensor(self, vec, pad):
-        return vec + [0] * (pad - len(vec))
+        return vec + [103] * (pad - len(vec))
 
     def pad_collate(self, batch):
         # The input here is actually a list of dictionary.

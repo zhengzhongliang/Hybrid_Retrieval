@@ -116,7 +116,7 @@ class PadCollateOpenbookTrain:
 
     def pad_tensor(self, vec, pad):
 
-        return vec + [0] * (pad - len(vec))
+        return vec + [103] * (pad - len(vec))
 
     def pad_collate(self, batch):
         """
@@ -211,7 +211,7 @@ class PadCollateOpenbookEvalQuery:
         Nothing to add here
         """
     def _pad_tensor(self, vec, pad):
-        return vec + [0] * (pad - len(vec))
+        return vec + [103] * (pad - len(vec))
 
     def pad_collate(self, batch):
         # The input here is actually a list of dictionary.
@@ -266,7 +266,7 @@ class PadCollateOpenbookEvalFact:
         """
 
     def _pad_tensor(self, vec, pad):
-        return vec + [0] * (pad - len(vec))
+        return vec + [103] * (pad - len(vec))
 
     def pad_collate(self, batch):
         # The input here is actually a list of dictionary.
