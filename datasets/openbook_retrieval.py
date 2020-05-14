@@ -301,7 +301,7 @@ class OpenbookRetrievalDatasetEvalFact(Dataset):
         self.instance_list=  []
         for sent in kb:
             # cls_id = 101; sep_id = 102; pad_id = 0;
-            fact_token_ids = tokenizer.tokenize(sent)
+            fact_token_ids = tokenizer.convert_tokens_to_ids(tokenizer.tokenize(sent))
             fact_seg_ids = [0]*len(fact_token_ids)
 
             instance_new = {}

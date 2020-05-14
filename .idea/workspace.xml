@@ -1,11 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="7974c150-ca04-41f1-95a6-4f53dc884f9b" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/datasets/openbook_retrieval.py" beforeDir="false" afterPath="$PROJECT_DIR$/datasets/openbook_retrieval.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/experiments_IR/squad_train_eval.py" beforeDir="false" afterPath="$PROJECT_DIR$/experiments_IR/train_eval_openbook_squad_nq.py" afterDir="false" />
-    </list>
+    <list default="true" id="7974c150-ca04-41f1-95a6-4f53dc884f9b" name="Default Changelist" comment="" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -29,8 +25,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/experiments_IR/train_eval_openbook_squad_nq.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-477">
-              <caret line="258" column="86" lean-forward="true" selection-start-line="258" selection-start-column="86" selection-end-line="258" selection-end-column="86" />
+            <state relative-caret-position="413">
+              <caret line="319" column="8" selection-start-line="319" selection-start-column="8" selection-end-line="319" selection-end-column="8" />
               <folding>
                 <element signature="e#0#10#0" expanded="true" />
               </folding>
@@ -59,7 +55,7 @@
         <entry file="file://$PROJECT_DIR$/datasets/openbook_retrieval.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="-3040">
-              <caret line="89" column="50" lean-forward="true" selection-start-line="89" selection-start-column="50" selection-end-line="89" selection-end-column="50" />
+              <caret line="89" column="50" selection-start-line="89" selection-start-column="50" selection-end-line="89" selection-end-column="50" />
               <folding>
                 <element signature="e#0#25#0" expanded="true" />
               </folding>
@@ -201,9 +197,8 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="5" y="23" width="832" height="805" extended-state="0" />
-    <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.21701603" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.21701603" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
@@ -214,7 +209,7 @@
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="6" weight="0.33008358" />
       <window_info anchor="bottom" id="Version Control" order="7" />
-      <window_info anchor="bottom" id="Terminal" order="8" visible="true" weight="0.27208975" />
+      <window_info active="true" anchor="bottom" id="Terminal" order="8" visible="true" weight="0.27208975" />
       <window_info anchor="bottom" id="Event Log" order="9" side_tool="true" />
       <window_info anchor="bottom" id="Python Console" order="10" weight="0.32916668" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
@@ -252,7 +247,7 @@
     <entry file="file://$PROJECT_DIR$/datasets/openbook_retrieval.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-3040">
-          <caret line="89" column="50" lean-forward="true" selection-start-line="89" selection-start-column="50" selection-end-line="89" selection-end-column="50" />
+          <caret line="89" column="50" selection-start-line="89" selection-start-column="50" selection-end-line="89" selection-end-column="50" />
           <folding>
             <element signature="e#0#25#0" expanded="true" />
           </folding>
@@ -261,8 +256,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/experiments_IR/train_eval_openbook_squad_nq.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-477">
-          <caret line="258" column="86" lean-forward="true" selection-start-line="258" selection-start-column="86" selection-end-line="258" selection-end-column="86" />
+        <state relative-caret-position="413">
+          <caret line="319" column="8" selection-start-line="319" selection-start-column="8" selection-end-line="319" selection-end-column="8" />
           <folding>
             <element signature="e#0#10#0" expanded="true" />
           </folding>
