@@ -79,6 +79,12 @@ class BertSQuADRetriever(nn.Module):
         for i, batch in enumerate(squad_retrieval_train_dataloader):
             optimizer.zero_grad()
 
+            tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
+            print("="*20)
+            for query_token_id in batch["query_token_ids"]:
+                print(tokenizer.convert_ids_to_tokens(query_token_id))
+                input("AAA")
+
             query_output_tensor, fact_output_tensor = self.forward_train(batch["query_token_ids"].to(self.device),
                                                                  batch["query_seg_ids"].to(self.device),
                                                                  batch["fact_token_ids"].to(self.device),
