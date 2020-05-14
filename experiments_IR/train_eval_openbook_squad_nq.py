@@ -251,7 +251,7 @@ def train_and_eval_model(args, saved_pickle_path = parent_folder_path + "/data_g
         train_list, dev_list, test_list, kb = openbook_retrieval.construct_retrieval_dataset_openbook(num_neg_sample = N_NEG_FACT, random_seed = args.seed)
 
         openbook_retrieval_train_dataset = openbook_retrieval.OpenbookRetrievalDatasetTrain(
-            instance_list=train_list[:200],
+            instance_list=train_list,
             kb=kb,
             tokenizer=tokenizer)
 
