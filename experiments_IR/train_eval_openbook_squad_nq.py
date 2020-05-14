@@ -83,7 +83,7 @@ class BertSQuADRetriever(nn.Module):
             print("="*20)
             for query_token_id in batch["query_token_ids"]:
                 print(query_token_id)
-                print(tokenizer.convert_ids_to_tokens([id_tensor.data[0] for id_tensor in query_token_id]))
+                print(tokenizer.convert_ids_to_tokens(query_token_id.tolist()))
                 input("AAA")
 
             query_output_tensor, fact_output_tensor = self.forward_train(batch["query_token_ids"].to(self.device),
