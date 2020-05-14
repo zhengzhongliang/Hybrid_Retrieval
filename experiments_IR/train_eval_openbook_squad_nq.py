@@ -16,7 +16,7 @@ import pickle
 import numpy as np
 import time
 
-import squad_retrieval
+import squad_retrieval, openbook_retrieval
 import random
 import datetime
 import os
@@ -198,52 +198,95 @@ def train_and_eval_model(args, saved_pickle_path = parent_folder_path + "/data_g
 
     optimizer = optim.Adam(bert_retriever.parameters(), lr=0.00001)
 
-    # Load SQuAD dataset and dataloader.
-    squad_retrieval_data = squad_retrieval.convert_squad_to_retrieval(tokenizer, random_seed = args.seed, num_dev = args.num_dev)
+    now = datetime.datetime.now()
+    date_time = str(now)[:10] + '_' + str(now)[11:13] + str(now)[14:16]
 
-    squad_retrieval_train_dataset = squad_retrieval.SQuADRetrievalDatasetTrain(instance_list=squad_retrieval_data["train_list"],
-                                                               sent_list=squad_retrieval_data["sent_list"],
-                                                               doc_list=squad_retrieval_data["doc_list"],
-                                                               resp_list=squad_retrieval_data["resp_list"],
-                                                               tokenizer=tokenizer,
-                                                               random_seed=args.seed,
-                                                                n_negative_sample = N_NEG_FACT)
+    if args.dataset=="squad":
+        # Load SQuAD dataset and dataloader.
+        squad_retrieval_data = squad_retrieval.convert_squad_to_retrieval(tokenizer, random_seed = args.seed, num_dev = args.num_dev)
 
-    squad_retrieval_train_dataloader = DataLoader(squad_retrieval_train_dataset, batch_size=BATCH_SIZE_TRAIN,
-                                                  shuffle=True, num_workers=NUM_WORKERS, collate_fn=squad_retrieval.PadCollateSQuADTrain())
+        squad_retrieval_train_dataset = squad_retrieval.SQuADRetrievalDatasetTrain(instance_list=squad_retrieval_data["train_list"],
+                                                                   sent_list=squad_retrieval_data["sent_list"],
+                                                                   doc_list=squad_retrieval_data["doc_list"],
+                                                                   resp_list=squad_retrieval_data["resp_list"],
+                                                                   tokenizer=tokenizer,
+                                                                   random_seed=args.seed,
+                                                                    n_negative_sample = N_NEG_FACT)
 
-    squad_retrieval_dev_dataset = squad_retrieval.SQuADRetrievalDatasetEvalQuery(instance_list=squad_retrieval_data["dev_list"],
-                                                                 sent_list=squad_retrieval_data["sent_list"],
-                                                                 doc_list=squad_retrieval_data["doc_list"],
-                                                                 resp_list=squad_retrieval_data["resp_list"],
-                                                                 tokenizer=tokenizer)
+        retrieval_train_dataloader = DataLoader(squad_retrieval_train_dataset, batch_size=BATCH_SIZE_TRAIN,
+                                                      shuffle=True, num_workers=NUM_WORKERS, collate_fn=squad_retrieval.PadCollateSQuADTrain())
 
-    squad_retrieval_dev_dataloader = DataLoader(squad_retrieval_dev_dataset, batch_size=BATCH_SIZE_EVAL,
-                                                shuffle=False, num_workers=NUM_WORKERS, collate_fn=squad_retrieval.PadCollateSQuADEvalQuery())
+        squad_retrieval_dev_dataset = squad_retrieval.SQuADRetrievalDatasetEvalQuery(instance_list=squad_retrieval_data["dev_list"],
+                                                                     sent_list=squad_retrieval_data["sent_list"],
+                                                                     doc_list=squad_retrieval_data["doc_list"],
+                                                                     resp_list=squad_retrieval_data["resp_list"],
+                                                                     tokenizer=tokenizer)
 
-    squad_retrieval_test_dataset = squad_retrieval.SQuADRetrievalDatasetEvalQuery(instance_list=squad_retrieval_data["test_list"],
-                                                                  sent_list=squad_retrieval_data["sent_list"],
-                                                                  doc_list=squad_retrieval_data["doc_list"],
-                                                                  resp_list=squad_retrieval_data["resp_list"],
-                                                                  tokenizer=tokenizer)
+        retrieval_dev_dataloader = DataLoader(squad_retrieval_dev_dataset, batch_size=BATCH_SIZE_EVAL,
+                                                    shuffle=False, num_workers=NUM_WORKERS, collate_fn=squad_retrieval.PadCollateSQuADEvalQuery())
 
-    squad_retrieval_test_dataloader = DataLoader(squad_retrieval_test_dataset, batch_size=BATCH_SIZE_EVAL,
-                                                 shuffle=False, num_workers=NUM_WORKERS, collate_fn=squad_retrieval.PadCollateSQuADEvalQuery())
-
-    squad_retrieval_eval_fact_dataset = squad_retrieval.SQuADRetrievalDatasetEvalFact(instance_list=squad_retrieval_data["resp_list"],
+        squad_retrieval_test_dataset = squad_retrieval.SQuADRetrievalDatasetEvalQuery(instance_list=squad_retrieval_data["test_list"],
                                                                       sent_list=squad_retrieval_data["sent_list"],
                                                                       doc_list=squad_retrieval_data["doc_list"],
                                                                       resp_list=squad_retrieval_data["resp_list"],
                                                                       tokenizer=tokenizer)
 
-    squad_retrieval_eval_fact_dataloader = DataLoader(squad_retrieval_eval_fact_dataset, batch_size=BATCH_SIZE_EVAL,
-                                                      shuffle=False, num_workers=NUM_WORKERS,
-                                                      collate_fn=squad_retrieval.PadCollateSQuADEvalFact())
+        retrieval_test_dataloader = DataLoader(squad_retrieval_test_dataset, batch_size=BATCH_SIZE_EVAL,
+                                                     shuffle=False, num_workers=NUM_WORKERS, collate_fn=squad_retrieval.PadCollateSQuADEvalQuery())
 
-    # TODO: save foler path. If no folder is found, make directory.
-    now = datetime.datetime.now()
-    date_time = str(now)[:10] + '_' + str(now)[11:13] + str(now)[14:16]
-    save_folder_path = parent_folder_path+'/data_generated/squad_retrieval_seed_' + str(args.seed) + "_" + date_time+"/"
+        squad_retrieval_eval_fact_dataset = squad_retrieval.SQuADRetrievalDatasetEvalFact(instance_list=squad_retrieval_data["resp_list"],
+                                                                          sent_list=squad_retrieval_data["sent_list"],
+                                                                          doc_list=squad_retrieval_data["doc_list"],
+                                                                          resp_list=squad_retrieval_data["resp_list"],
+                                                                          tokenizer=tokenizer)
+
+        retrieval_eval_fact_dataloader = DataLoader(squad_retrieval_eval_fact_dataset, batch_size=BATCH_SIZE_EVAL,
+                                                          shuffle=False, num_workers=NUM_WORKERS,
+                                                          collate_fn=squad_retrieval.PadCollateSQuADEvalFact())
+
+        save_folder_path = parent_folder_path+'/data_generated/squad_retrieval_seed_' + str(args.seed) + "_" + date_time+"/"
+
+
+    elif args.dataset=="openbook":
+        train_list, dev_list, test_list, kb = openbook_retrieval.construct_retrieval_dataset_openbook(num_neg_sample = N_NEG_FACT, random_seed = args.seed)
+
+        openbook_retrieval_train_dataset = openbook_retrieval.OpenbookRetrievalDatasetTrain(
+            instance_list=train_list,
+            kb=kb,
+            tokenizer=tokenizer)
+
+        retrieval_train_dataloader = DataLoader(openbook_retrieval_train_dataset, batch_size=BATCH_SIZE_TRAIN,
+                                                shuffle=True, num_workers=NUM_WORKERS,
+                                                collate_fn=openbook_retrieval.PadCollateOpenbookTrain())
+
+        openbook_retrieval_dev_dataset = openbook_retrieval.OpenbookRetrievalDatasetEvalQuery(
+            instance_list=dev_list,
+            tokenizer=tokenizer)
+
+        retrieval_dev_dataloader = DataLoader(openbook_retrieval_dev_dataset, batch_size=BATCH_SIZE_EVAL,
+                                              shuffle=False, num_workers=NUM_WORKERS,
+                                              collate_fn=openbook_retrieval.PadCollateOpenbookEvalQuery())
+
+        openbook_retrieval_test_dataset = openbook_retrieval.OpenbookRetrievalDatasetEvalQuery(
+            instance_list=test_list,
+            tokenizer=tokenizer)
+
+        retrieval_test_dataloader = DataLoader(openbook_retrieval_test_dataset, batch_size=BATCH_SIZE_EVAL,
+                                              shuffle=False, num_workers=NUM_WORKERS,
+                                              collate_fn=openbook_retrieval.PadCollateOpenbookEvalQuery())
+
+        openbook_retrieval_eval_fact_dataset = openbook_retrieval.OpenbookRetrievalDatasetEvalFact(
+            kb=kb,
+            tokenizer=tokenizer)
+
+        retrieval_eval_fact_dataloader = DataLoader(openbook_retrieval_eval_fact_dataset, batch_size=BATCH_SIZE_EVAL,
+                                                    shuffle=False, num_workers=NUM_WORKERS,
+                                                    collate_fn=openbook_retrieval.PadCollateOpenbookEvalFact())
+
+        save_folder_path = parent_folder_path+'/data_generated/openbook_retrieval_seed_' + str(args.seed) + "_" + date_time+"/"
+
+    else:
+        return 0
 
     if not os.path.exists(save_folder_path):
         os.makedirs(save_folder_path)
@@ -254,11 +297,13 @@ def train_and_eval_model(args, saved_pickle_path = parent_folder_path + "/data_g
     for epoch in range(N_EPOCH):
         print("="*20)
         print("Epoch ", epoch+1)
-        train_loss = bert_retriever.train_epoch(optimizer, squad_retrieval_train_dataloader)
-        dev_result_dict, test_result_dict = bert_retriever.eval_epoch(squad_retrieval_dev_dataloader, squad_retrieval_test_dataloader, squad_retrieval_eval_fact_dataloader)
+        train_loss = bert_retriever.train_epoch(optimizer, retrieval_train_dataloader)
+        dev_result_dict, test_result_dict = bert_retriever.eval_epoch(retrieval_dev_dataloader, retrieval_test_dataloader, retrieval_eval_fact_dataloader)
 
         dev_mrr = sum(dev_result_dict["mrr"])/len(dev_result_dict["mrr"])
         test_mrr = sum(test_result_dict["mrr"])/len(test_result_dict["mrr"])
+
+        print("\t\tepoch "+str(epoch+1)+" training loss:"+str(train_loss)+" dev mrr:"+str(test_mrr)+" test mrr:"+str(test_mrr))
 
         main_result_array[epoch,:] = [train_loss, dev_mrr, test_mrr]
 
@@ -272,7 +317,7 @@ def train_and_eval_model(args, saved_pickle_path = parent_folder_path + "/data_g
             with open(save_folder_path+"test_dict.pickle", "wb") as handle:
                 pickle.dump(test_result_dict, handle)
 
-    np.save(save_folder_path+"main_result.npy", main_result_array)
+        np.save(save_folder_path+"main_result.npy", main_result_array)
 
     return 0
 
@@ -291,6 +336,7 @@ def main():
     parser.add_argument("--n_neg_sample", type=int, default=4)
     parser.add_argument("--num_dev", type=int, default=2000)
     parser.add_argument("--max_seq_len", type = int, default = 256)  # TODO: think about a way to pass this value to the collate function.
+    parser.add_argument("--dataset", type=str, default="openbook")
 
     # parse the input arguments
     args = parser.parse_args()
