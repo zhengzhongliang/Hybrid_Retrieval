@@ -81,8 +81,10 @@ class BertSQuADRetriever(nn.Module):
 
             query_output_tensor, fact_output_tensor = self.forward_train(batch["query_token_ids"].to(self.device),
                                                                  batch["query_seg_ids"].to(self.device),
+                                                                 batch["query_att_mask_ids"].to(self.device),
                                                                  batch["fact_token_ids"].to(self.device),
-                                                                 batch["fact_seg_ids"].to(self.device))
+                                                                 batch["fact_seg_ids"].to(self.device),
+                                                                 batch["fact_att_mask_ids"].to(self.device))
 
             scores = torch.matmul(fact_output_tensor, query_output_tensor).squeeze(dim=2)
 
@@ -127,7 +129,7 @@ class BertSQuADRetriever(nn.Module):
             # First step: compute all fact embeddings
             fact_embds = []
             for i, batch in enumerate(retrieval_eval_fact_dataloader):
-                fact_embds_batch = self.forward_eval_fact(batch["fact_token_ids"].to(self.device), batch["fact_seg_ids"].to(self.device))
+                fact_embds_batch = self.forward_eval_fact(batch["fact_token_ids"].to(self.device), batch["fact_seg_ids"].to(self.device), batch["fact_att_mask_ids"].to(self.device))
                 fact_embds.append(fact_embds_batch.detach().cpu().numpy())
                 if (i+1)%100==0:
                     print("\tget fact "+str(i+1))
@@ -137,7 +139,7 @@ class BertSQuADRetriever(nn.Module):
             # Second step: compute the query embedding for each batch. At the same time return the needed results.
             dev_results_dict = {"mrr": [], "gold_fact_index": [], "gold_fact_ranking": [], "gold_fact_score": [], "top_64_facts":[], "top_64_scores":[]}
             for i, batch in enumerate(retrieval_dev_dataloader):
-                query_embds_batch = self.forward_eval_query(batch["query_token_ids"].to(self.device),batch["query_seg_ids"].to(self.device))
+                query_embds_batch = self.forward_eval_query(batch["query_token_ids"].to(self.device),batch["query_seg_ids"].to(self.device),batch["query_att_mask_ids"].to(self.device))
                 query_embds_batch = query_embds_batch.detach().cpu().numpy()
 
                 self._fill_results_dict(batch, query_embds_batch, fact_embds, dev_results_dict)
@@ -148,7 +150,7 @@ class BertSQuADRetriever(nn.Module):
             # Third step: compute the query embedding for each batch, then store the result to a dict.
             test_results_dict = {"mrr": [], "gold_fact_index": [], "gold_fact_ranking": [], "gold_fact_score": [], "top_64_facts":[], "top_64_scores":[]}
             for i, batch in enumerate(retrieval_test_dataloader):
-                query_embds_batch = self.forward_eval_query(batch["query_token_ids"].to(self.device), batch["query_seg_ids"].to(self.device))
+                query_embds_batch = self.forward_eval_query(batch["query_token_ids"].to(self.device), batch["query_seg_ids"].to(self.device),batch["query_att_mask_ids"].to(self.device))
                 query_embds_batch = query_embds_batch.detach().cpu().numpy()
 
                 self._fill_results_dict(batch, query_embds_batch, fact_embds, test_results_dict)

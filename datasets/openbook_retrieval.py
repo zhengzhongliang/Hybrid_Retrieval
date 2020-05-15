@@ -336,3 +336,70 @@ class OpenbookRetrievalDatasetEvalFact(Dataset):
 
     def __getitem__(self, idx):
         return self.instance_list[idx]
+
+
+def check_openbook_dataloader(n_neg_fact = 4, seed = 0, batch_size = 3, num_workers = 3):
+    tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
+
+    train_list, dev_list, test_list, kb = construct_retrieval_dataset_openbook(
+        num_neg_sample=n_neg_fact, random_seed=seed)
+
+
+    '''
+    ===============================================================
+    Check openbook retrieval train
+    '''
+    openbook_retrieval_train_dataset = OpenbookRetrievalDatasetTrain(
+        instance_list=train_list,
+        kb=kb,
+        tokenizer=tokenizer)
+
+    retrieval_train_dataloader = DataLoader(openbook_retrieval_train_dataset, batch_size=batch_size,
+                                            shuffle=True, num_workers=num_workers,
+                                            collate_fn=PadCollateOpenbookTrain())
+
+    print("="*20+"\n check training")
+    for i, batch in enumerate(retrieval_train_dataloader):
+        if i>5:
+            break
+
+        print("-"*20)
+        print(batch["query_token_ids"].size())
+        print(batch["fact_token_ids"].size())
+
+
+    '''
+    ===============================================================
+    Check openbook retrieval dev query
+    '''
+    openbook_retrieval_dev_dataset = OpenbookRetrievalDatasetEvalQuery(
+        instance_list=dev_list,
+        tokenizer=tokenizer)
+
+    retrieval_dev_dataloader = DataLoader(openbook_retrieval_dev_dataset, batch_size=batch_size,
+                                          shuffle=False, num_workers=num_workers,
+                                          collate_fn=PadCollateOpenbookEvalQuery())
+
+    '''
+    ===============================================================
+    Check openbook retrieval test query
+    '''
+    openbook_retrieval_test_dataset = OpenbookRetrievalDatasetEvalQuery(
+        instance_list=test_list,
+        tokenizer=tokenizer)
+
+    retrieval_test_dataloader = DataLoader(openbook_retrieval_test_dataset, batch_size=batch_size,
+                                           shuffle=False, num_workers=num_workers,
+                                           collate_fn=PadCollateOpenbookEvalQuery())
+
+    '''
+    ===============================================================
+    Check openbook retrieval eval fact
+    '''
+    openbook_retrieval_eval_fact_dataset = OpenbookRetrievalDatasetEvalFact(
+        kb=kb,
+        tokenizer=tokenizer)
+
+    retrieval_eval_fact_dataloader = DataLoader(openbook_retrieval_eval_fact_dataset, batch_size=batch_size,
+                                                shuffle=False, num_workers=num_workers,
+                                                collate_fn=PadCollateOpenbookEvalFact())
