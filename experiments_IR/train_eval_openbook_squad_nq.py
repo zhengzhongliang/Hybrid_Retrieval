@@ -305,7 +305,7 @@ def train_and_eval_model(args, saved_pickle_path = parent_folder_path + "/data_g
         dev_mrr = sum(dev_result_dict["mrr"])/len(dev_result_dict["mrr"])
         test_mrr = sum(test_result_dict["mrr"])/len(test_result_dict["mrr"])
 
-        print("\t\tepoch "+str(epoch+1)+" training loss:"+str(train_loss)+" dev mrr:"+str(test_mrr)+" test mrr:"+str(test_mrr))
+        print("\t\tepoch "+str(epoch+1)+" training loss:"+str(train_loss)+" dev mrr:"+str(dev_mrr)+" test mrr:"+str(test_mrr))
 
         main_result_array[epoch,:] = [train_loss, dev_mrr, test_mrr]
 
