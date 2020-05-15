@@ -114,9 +114,9 @@ class PadCollateOpenbookTrain:
         Nothing to add here
         """
 
-    def pad_tensor(self, vec, pad):
+    def pad_tensor(self, vec, pad, pad_value = 0):
 
-        return vec + [103] * (pad - len(vec))
+        return vec + [pad_value] * (pad - len(vec))
 
     def pad_collate(self, batch):
         """
@@ -134,26 +134,34 @@ class PadCollateOpenbookTrain:
         # pad according to max_len
         for sample in batch:
             sample["query_token_ids"]  = self.pad_tensor(sample["query_token_ids"], pad=max_len_query)
+            sample["query_att_mask_ids"] = self.pad_tensor(sample["query_att_mask_ids"], pad=max_len_query)
         # stack all
 
         # the output of this function needs to be a already batched function.
         batch_returned = {}
-        batch_returned["query_token_ids"] = torch.tensor([[101]+sample["query_token_ids"]+[102] for sample in batch])
-        batch_returned["query_seg_ids"] = torch.tensor([[0]*(max_len_query+2) for sample in batch])
+        batch_returned["query_token_ids"] = torch.tensor([sample["query_token_ids"] for sample in batch])
+        batch_returned["query_att_mask_ids"] = torch.tensor([sample["query_att_mask_ids"] for sample in batch])
+        batch_returned["query_seg_ids"] = torch.tensor([[0]*max_len_query for sample in batch])
 
         all_facts_ids = []
+        all_facts_att_mask_ids = []
         for sample in batch:
             all_facts_ids.extend(sample["fact_token_ids"])
+            all_facts_att_mask_ids.extend(sample["fact_att_mask_ids"])
 
         max_len_fact = max([len(fact_token_ids) for fact_token_ids in all_facts_ids])
 
         for i, fact_ids in enumerate(all_facts_ids):
-            all_facts_ids[i]  = self.pad_tensor(fact_ids, pad=max_len_fact)
+            all_facts_ids[i] = self.pad_tensor(fact_ids, pad=max_len_fact)
+
+        for i, fact_att_mask_ids in enumerate(all_facts_att_mask_ids):
+            all_facts_att_mask_ids[i] = self.pad_tensor(fact_att_mask_ids, pad=max_len_fact)
         # stack all
 
         # the output of this function needs to be a already batched function.
-        batch_returned["fact_token_ids"] = torch.tensor([[101]+fact_ids+[102] for fact_ids in all_facts_ids])
-        batch_returned["fact_seg_ids"] = torch.tensor([[0]*(max_len_fact+2) for fact_ids in all_facts_ids])
+        batch_returned["fact_token_ids"] = torch.tensor([fact_ids for fact_ids in all_facts_ids])
+        batch_returned["fact_att_mask_ids"] = torch.tensor([fact_att_mask_ids for fact_att_mask_ids in all_facts_att_mask_ids])
+        batch_returned["fact_seg_ids"] = torch.tensor([[0]*max_len_fact for fact_ids in all_facts_ids])
 
         batch_returned["label_in_distractor"] = torch.tensor([sample["label_in_distractor"] for sample in batch])
 
@@ -179,20 +187,25 @@ class OpenbookRetrievalDatasetTrain(Dataset):
         for instance in instance_list:
             # cls_id = 101; sep_id = 102; pad_id = 0;
             query_tokens = tokenizer.tokenize(instance["text"])   # this is for strip quotes
-            query_token_ids = tokenizer.convert_tokens_to_ids(query_tokens)   # this does not include pad, cls or sep
+            query_token_ids = [101] + tokenizer.convert_tokens_to_ids(query_tokens) + [102]   # this does not include pad, cls or sep
+            query_att_mask_ids = [1]*len(query_token_ids)   # use [1] on non-pad token
 
             fact_token_ids = []
             fact_seg_ids = []
+            fact_att_mask_ids = []
             for fact_index in instance["documents"]:
                 single_fact_tokens = tokenizer.tokenize(kb[fact_index][1:-1]) # this if for removing the quotes
-                single_fact_token_ids = tokenizer.convert_tokens_to_ids(single_fact_tokens)
+                single_fact_token_ids = [101] + tokenizer.convert_tokens_to_ids(single_fact_tokens)+ [102]
                 fact_token_ids.append(single_fact_token_ids)
                 fact_seg_ids.append([0]*len(single_fact_token_ids))
+                fact_att_mask_ids.append([1]*len(single_fact_token_ids))   # use [1] on non-pad token
 
             instance["query_token_ids"] = query_token_ids
             instance["query_seg_ids"] = [0]*len(query_token_ids)
+            instance["query_att_mask_ids"] = query_att_mask_ids
             instance["fact_token_ids"] = fact_token_ids
             instance["fact_seg_ids"] = fact_seg_ids
+            instance["fact_att_mask_ids"] = fact_att_mask_ids
 
             instance["label_in_distractor"] = 0
 
@@ -211,7 +224,7 @@ class PadCollateOpenbookEvalQuery:
         Nothing to add here
         """
     def _pad_tensor(self, vec, pad):
-        return vec + [103] * (pad - len(vec))
+        return vec + [0] * (pad - len(vec))
 
     def pad_collate(self, batch):
         # The input here is actually a list of dictionary.
@@ -220,12 +233,14 @@ class PadCollateOpenbookEvalQuery:
         # pad according to max_len
         for sample in batch:
             sample["query_token_ids"]  = self._pad_tensor(sample["query_token_ids"], pad=max_len_query)
+            sample["query_att_mask_ids"] = self._pad_tensor(sample["query_att_mask_ids"], pad = max_len_query)
         # stack all
 
         # the output of this function needs to be a already batched function.
         batch_returned = {}
-        batch_returned["query_token_ids"] = torch.tensor([[101]+sample["query_token_ids"]+[102] for sample in batch])
-        batch_returned["query_seg_ids"] = torch.tensor([[0]*(max_len_query+2) for sample in batch])
+        batch_returned["query_token_ids"] = torch.tensor([sample["query_token_ids"] for sample in batch])
+        batch_returned["query_att_mask_ids"] = torch.tensor([sample["query_att_mask_ids"] for sample in batch])
+        batch_returned["query_seg_ids"] = torch.tensor([[0]*max_len_query for sample in batch])
         batch_returned["response"] = torch.tensor([sample["label"] for sample in batch])
 
         return batch_returned
@@ -245,11 +260,12 @@ class OpenbookRetrievalDatasetEvalQuery(Dataset):
         self.instance_list=  []
         for instance in instance_list:
             # cls_id = 101; sep_id = 102; pad_id = 0;
-            query_tokens = tokenizer.tokenize(instance["text"])   # this is for strip quotes
-            query_token_ids = tokenizer.convert_tokens_to_ids(query_tokens)   # this does not include pad, cls or sep
+            query_tokens = tokenizer.tokenize(instance["text"])  # this is for strip quotes
+            query_token_ids = [101]+ tokenizer.convert_tokens_to_ids(query_tokens)+[102]    # this does not include pad, cls or sep
 
             instance["query_token_ids"] = query_token_ids
             instance["query_seg_ids"] = [0]*len(query_token_ids)  # use seg id 0 for query.
+            instance["query_att_mask_ids"] = [1]*len(query_token_ids)   # use [1] on non-pad token
 
         self.instance_list = instance_list
 
@@ -266,23 +282,27 @@ class PadCollateOpenbookEvalFact:
         """
 
     def _pad_tensor(self, vec, pad):
-        return vec + [103] * (pad - len(vec))
+        return vec + [0] * (pad - len(vec))
 
     def pad_collate(self, batch):
         # The input here is actually a list of dictionary.
         # find longest sequence
         batch_returned = {}
         all_facts_ids = []
+        all_facts_att_mask_ids = []
 
         max_len_fact = max([len(sample["fact_token_ids"]) for sample in batch])
 
         for sample in batch:
-            all_facts_ids.append(self._pad_tensor(sample["fact_token_ids"], pad=max_len_fact)[:min(254, max_len_fact)])
+            all_facts_ids.append(self._pad_tensor(sample["fact_token_ids"], pad=max_len_fact)[:min(256, max_len_fact)])
+            all_facts_att_mask_ids.append(self._pad_tensor(sample["fact_att_mask_ids"], pad=max_len_fact)[:min(256, max_len_fact)])
+
         # stack all
 
         # the output of this function needs to be a already batched function.
-        batch_returned["fact_token_ids"] = torch.tensor([[101]+fact_ids+[102] for fact_ids in all_facts_ids])
-        batch_returned["fact_seg_ids"] = torch.tensor([[0]*min(max_len_fact+2, 256) for fact_ids in all_facts_ids])
+        batch_returned["fact_token_ids"] = torch.tensor([fact_ids for fact_ids in all_facts_ids])
+        batch_returned["fact_seg_ids"] = torch.tensor([[0]*min(max_len_fact, 256) for fact_ids in all_facts_ids])
+        batch_returned["fact_att_mask_ids"] = torch.tensor([fact_att_mask_ids for fact_att_mask_ids in all_facts_att_mask_ids])
 
         return batch_returned
 
@@ -301,12 +321,13 @@ class OpenbookRetrievalDatasetEvalFact(Dataset):
         self.instance_list=  []
         for sent in kb:
             # cls_id = 101; sep_id = 102; pad_id = 0;
-            fact_token_ids = tokenizer.convert_tokens_to_ids(tokenizer.tokenize(sent))
+            fact_token_ids = [101] + tokenizer.convert_tokens_to_ids(tokenizer.tokenize(sent)) + [102]
             fact_seg_ids = [0]*len(fact_token_ids)
 
             instance_new = {}
             instance_new["fact_token_ids"] = fact_token_ids
             instance_new["fact_seg_ids"] = fact_seg_ids
+            instance_new["fact_att_mask_ids"] = [1]*len(fact_token_ids)   # use [1] on non-pad tokens
 
             self.instance_list.append(instance_new)
 

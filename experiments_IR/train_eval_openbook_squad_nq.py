@@ -42,9 +42,9 @@ class BertSQuADRetriever(nn.Module):
         self.batch_size_train = batch_size_train
         self.batch_size_eval = batch_size_eval
 
-    def forward_train(self, query_token_ids, query_seg_ids, fact_token_ids, fact_seg_ids):
-        query_output_tensor_, _ = self.bert_q(query_token_ids, query_seg_ids)
-        fact_output_tensor_, _ = self.bert_d(fact_token_ids, fact_seg_ids)
+    def forward_train(self, query_token_ids, query_seg_ids, query_att_mask_ids, fact_token_ids, fact_seg_ids, fact_att_mask_ids):
+        query_output_tensor_, _ = self.bert_q(input_ids = query_token_ids, token_type_ids = query_seg_ids, attention_mask = query_att_mask_ids)
+        fact_output_tensor_, _ = self.bert_d(input_ids = fact_token_ids, token_type_ids = fact_seg_ids, attention_mask = fact_att_mask_ids)
 
         batch_size = query_token_ids.size()[0]
 
@@ -53,8 +53,8 @@ class BertSQuADRetriever(nn.Module):
 
         return query_output_tensor, fact_output_tensor
 
-    def forward_eval_query(self, query_token_ids, query_seg_ids):
-        query_output_tensor_, _ = self.bert_q(query_token_ids, query_seg_ids)
+    def forward_eval_query(self, query_token_ids, query_seg_ids, query_att_mask_ids):
+        query_output_tensor_, _ = self.bert_q(input_ids = query_token_ids, token_type_ids = query_seg_ids, attention_mask = query_att_mask_ids)
 
         batch_size = query_token_ids.size()[0]
 
@@ -62,8 +62,8 @@ class BertSQuADRetriever(nn.Module):
 
         return query_output_tensor
 
-    def forward_eval_fact(self, fact_token_ids, fact_seg_ids):
-        fact_output_tensor_, _ = self.bert_d(fact_token_ids, fact_seg_ids)
+    def forward_eval_fact(self, fact_token_ids, fact_seg_ids, fact_att_mask_ids):
+        fact_output_tensor_, _ = self.bert_d(input_ids = fact_token_ids, token_type_ids = fact_seg_ids, attention_mask = fact_att_mask_ids)
 
         batch_size = fact_token_ids.size()[0]
 
@@ -78,13 +78,6 @@ class BertSQuADRetriever(nn.Module):
         start_time = time.time()
         for i, batch in enumerate(squad_retrieval_train_dataloader):
             optimizer.zero_grad()
-
-            # tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
-            # print("="*20)
-            # for query_token_id in batch["query_token_ids"]:
-            #     print(query_token_id)
-            #     print(tokenizer.convert_ids_to_tokens(query_token_id.tolist()))
-            #     input("AAA")
 
             query_output_tensor, fact_output_tensor = self.forward_train(batch["query_token_ids"].to(self.device),
                                                                  batch["query_seg_ids"].to(self.device),
@@ -109,7 +102,7 @@ class BertSQuADRetriever(nn.Module):
         return total_loss/len(squad_retrieval_train_dataloader)
 
 
-    def eval_epoch(self, squad_retrieval_dev_dataloader, squad_retrieval_test_dataloader, squad_retrieval_eval_fact_dataloader):
+    def eval_epoch(self, retrieval_dev_dataloader, retrieval_test_dataloader, retrieval_eval_fact_dataloader):
 
         # ref size: 1,000*768 numpy array is about 3 MB.
         # dev query size: 2,000*768 = 6 MB.
@@ -133,7 +126,7 @@ class BertSQuADRetriever(nn.Module):
         with torch.no_grad():
             # First step: compute all fact embeddings
             fact_embds = []
-            for i, batch in enumerate(squad_retrieval_eval_fact_dataloader):
+            for i, batch in enumerate(retrieval_eval_fact_dataloader):
                 fact_embds_batch = self.forward_eval_fact(batch["fact_token_ids"].to(self.device), batch["fact_seg_ids"].to(self.device))
                 fact_embds.append(fact_embds_batch.detach().cpu().numpy())
                 if (i+1)%100==0:
@@ -143,7 +136,7 @@ class BertSQuADRetriever(nn.Module):
 
             # Second step: compute the query embedding for each batch. At the same time return the needed results.
             dev_results_dict = {"mrr": [], "gold_fact_index": [], "gold_fact_ranking": [], "gold_fact_score": [], "top_64_facts":[], "top_64_scores":[]}
-            for i, batch in enumerate(squad_retrieval_dev_dataloader):
+            for i, batch in enumerate(retrieval_dev_dataloader):
                 query_embds_batch = self.forward_eval_query(batch["query_token_ids"].to(self.device),batch["query_seg_ids"].to(self.device))
                 query_embds_batch = query_embds_batch.detach().cpu().numpy()
 
@@ -154,7 +147,7 @@ class BertSQuADRetriever(nn.Module):
 
             # Third step: compute the query embedding for each batch, then store the result to a dict.
             test_results_dict = {"mrr": [], "gold_fact_index": [], "gold_fact_ranking": [], "gold_fact_score": [], "top_64_facts":[], "top_64_scores":[]}
-            for i, batch in enumerate(squad_retrieval_test_dataloader):
+            for i, batch in enumerate(retrieval_test_dataloader):
                 query_embds_batch = self.forward_eval_query(batch["query_token_ids"].to(self.device), batch["query_seg_ids"].to(self.device))
                 query_embds_batch = query_embds_batch.detach().cpu().numpy()
 
