@@ -255,7 +255,8 @@ def train_and_eval_model(args, saved_pickle_path = parent_folder_path + "/data_g
         openbook_retrieval_train_dataset = openbook_retrieval.OpenbookRetrievalDatasetTrain(
             instance_list=train_list,
             kb=kb,
-            tokenizer=tokenizer)
+            tokenizer=tokenizer,
+            num_neg_sample = N_NEG_FACT)
 
         retrieval_train_dataloader = DataLoader(openbook_retrieval_train_dataset, batch_size=BATCH_SIZE_TRAIN,
                                                 shuffle=True, num_workers=NUM_WORKERS,
@@ -310,6 +311,7 @@ def train_and_eval_model(args, saved_pickle_path = parent_folder_path + "/data_g
         main_result_array[epoch,:] = [train_loss, dev_mrr, test_mrr]
 
         if dev_mrr > best_mrr:
+            best_mrr = dev_mrr
 
             torch.save(bert_retriever, save_folder_path+"saved_bert_retriever")
 

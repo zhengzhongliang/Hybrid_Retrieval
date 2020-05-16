@@ -175,7 +175,7 @@ class PadCollateOpenbookTrain:
 class OpenbookRetrievalDatasetTrain(Dataset):
     """Face Landmarks dataset."""
 
-    def __init__(self, instance_list, kb,  tokenizer):
+    def __init__(self, instance_list, kb,  tokenizer, num_neg_sample):
         """
         Args:
             csv_file (string): Path to the csv file with annotations.
@@ -190,31 +190,36 @@ class OpenbookRetrievalDatasetTrain(Dataset):
             query_token_ids = [101] + tokenizer.convert_tokens_to_ids(query_tokens) + [102]   # this does not include pad, cls or sep
             query_att_mask_ids = [1]*len(query_token_ids)   # use [1] on non-pad token
 
-            fact_token_ids = []
-            fact_seg_ids = []
-            fact_att_mask_ids = []
-            for fact_index in instance["documents"]:
-                single_fact_tokens = tokenizer.tokenize(kb[fact_index][1:-1]) # this if for removing the quotes
-                single_fact_token_ids = [101] + tokenizer.convert_tokens_to_ids(single_fact_tokens)+ [102]
-                fact_token_ids.append(single_fact_token_ids)
-                fact_seg_ids.append([0]*len(single_fact_token_ids))
-                fact_att_mask_ids.append([1]*len(single_fact_token_ids))   # use [1] on non-pad token
-
             instance["query_token_ids"] = query_token_ids
-            instance["query_seg_ids"] = [0]*len(query_token_ids)
+            instance["query_seg_ids"] = [0] * len(query_token_ids)
             instance["query_att_mask_ids"] = query_att_mask_ids
-            instance["fact_token_ids"] = fact_token_ids
-            instance["fact_seg_ids"] = fact_seg_ids
-            instance["fact_att_mask_ids"] = fact_att_mask_ids
 
             instance["label_in_distractor"] = 0
 
         self.instance_list = instance_list
+        self.kb = kb
+        self.tokenizer = tokenizer
+        self.num_neg_sample = num_neg_sample
 
     def __len__(self):
         return len(self.instance_list)
 
     def __getitem__(self, idx):
+        self.instance_list[idx]["documents"] = [self.instance_list[idx]["label"]]+random_negative_from_kb([self.instance_list[idx]["label"]], self.kb, self.num_neg_sample)
+
+        fact_token_ids = []
+        fact_seg_ids = []
+        fact_att_mask_ids = []
+        for fact_index in self.instance_list[idx]["documents"]:
+            single_fact_tokens = self.tokenizer.tokenize(self.kb[fact_index][1:-1])  # this if for removing the quotes
+            single_fact_token_ids = [101] + self.tokenizer.convert_tokens_to_ids(single_fact_tokens) + [102]
+            fact_token_ids.append(single_fact_token_ids)
+            fact_seg_ids.append([0] * len(single_fact_token_ids))
+            fact_att_mask_ids.append([1] * len(single_fact_token_ids))  # use [1] on non-pad token
+
+        self.instance_list[idx]["fact_token_ids"] = fact_token_ids
+        self.instance_list[idx]["fact_seg_ids"] = fact_seg_ids
+        self.instance_list[idx]["fact_att_mask_ids"] = fact_att_mask_ids
 
         return self.instance_list[idx]
 
@@ -338,7 +343,9 @@ class OpenbookRetrievalDatasetEvalFact(Dataset):
         return self.instance_list[idx]
 
 
-def check_openbook_dataloader(n_neg_fact = 4, seed = 0, batch_size = 3, num_workers = 3):
+def check_openbook_dataloader(n_neg_fact = 3, seed = 0, batch_size = 2, num_workers = 3):
+    n_batch_check =3
+
     tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
 
     train_list, dev_list, test_list, kb = construct_retrieval_dataset_openbook(
@@ -352,7 +359,8 @@ def check_openbook_dataloader(n_neg_fact = 4, seed = 0, batch_size = 3, num_work
     openbook_retrieval_train_dataset = OpenbookRetrievalDatasetTrain(
         instance_list=train_list,
         kb=kb,
-        tokenizer=tokenizer)
+        tokenizer=tokenizer,
+        num_neg_sample = n_neg_fact)
 
     retrieval_train_dataloader = DataLoader(openbook_retrieval_train_dataset, batch_size=batch_size,
                                             shuffle=True, num_workers=num_workers,
@@ -360,12 +368,30 @@ def check_openbook_dataloader(n_neg_fact = 4, seed = 0, batch_size = 3, num_work
 
     print("="*20+"\n check training")
     for i, batch in enumerate(retrieval_train_dataloader):
-        if i>5:
+        if i>=n_batch_check:
             break
 
         print("-"*20)
         print(batch["query_token_ids"].size())
         print(batch["fact_token_ids"].size())
+        print("\n")
+
+        for j in range(batch["query_token_ids"].size()[0]):
+            print("query ids:", batch["query_token_ids"][j])
+            print("query seg ids:", batch["query_seg_ids"][j])
+            print("query att mask ids:", batch["query_att_mask_ids"][j])
+            print("query tokens:", tokenizer.convert_ids_to_tokens(batch["query_token_ids"][j].tolist()))
+            print("\n")
+
+            for k in range(n_neg_fact+1):
+                print("\tfact ids:", batch["fact_token_ids"][j*(n_neg_fact+1)+k])
+                print("\tfact seg ids:", batch["fact_seg_ids"][j*(n_neg_fact+1)+k])
+                print("\tfact att mask ids:", batch["fact_att_mask_ids"][j*(n_neg_fact+1)+k])
+                print("\tfact tokens:", tokenizer.convert_ids_to_tokens(batch["fact_token_ids"][j*(n_neg_fact+1)+k].tolist()))
+                print("\n")
+
+        input("AAA")
+
 
 
     '''
@@ -380,6 +406,24 @@ def check_openbook_dataloader(n_neg_fact = 4, seed = 0, batch_size = 3, num_work
                                           shuffle=False, num_workers=num_workers,
                                           collate_fn=PadCollateOpenbookEvalQuery())
 
+    print("=" * 20 + "\n check dev query")
+    for i, batch in enumerate(retrieval_dev_dataloader):
+        if i >= n_batch_check:
+            break
+
+        print("-" * 20)
+        print(batch["query_token_ids"].size())
+        print("\n")
+
+        for j in range(batch["query_token_ids"].size()[0]):
+            print("query ids:", batch["query_token_ids"][j])
+            print("query seg ids:", batch["query_seg_ids"][j])
+            print("query att mask ids:", batch["query_att_mask_ids"][j])
+            print("query tokens:", tokenizer.convert_ids_to_tokens(batch["query_token_ids"][j].tolist()))
+            print("\n")
+
+        input("AAA")
+
     '''
     ===============================================================
     Check openbook retrieval test query
@@ -392,6 +436,24 @@ def check_openbook_dataloader(n_neg_fact = 4, seed = 0, batch_size = 3, num_work
                                            shuffle=False, num_workers=num_workers,
                                            collate_fn=PadCollateOpenbookEvalQuery())
 
+    print("=" * 20 + "\n check test query")
+    for i, batch in enumerate(retrieval_test_dataloader):
+        if i >= n_batch_check:
+            break
+
+        print("-" * 20)
+        print(batch["query_token_ids"].size())
+        print("\n")
+
+        for j in range(batch["query_token_ids"].size()[0]):
+            print("query ids:", batch["query_token_ids"][j])
+            print("query seg ids:", batch["query_seg_ids"][j])
+            print("query att mask ids:", batch["query_att_mask_ids"][j])
+            print("query tokens:", tokenizer.convert_ids_to_tokens(batch["query_token_ids"][j].tolist()))
+            print("\n")
+
+        input("AAA")
+
     '''
     ===============================================================
     Check openbook retrieval eval fact
@@ -403,3 +465,21 @@ def check_openbook_dataloader(n_neg_fact = 4, seed = 0, batch_size = 3, num_work
     retrieval_eval_fact_dataloader = DataLoader(openbook_retrieval_eval_fact_dataset, batch_size=batch_size,
                                                 shuffle=False, num_workers=num_workers,
                                                 collate_fn=PadCollateOpenbookEvalFact())
+
+    print("=" * 20 + "\n check eval fact")
+    for i, batch in enumerate(retrieval_train_dataloader):
+        if i >= n_batch_check:
+            break
+
+        print("-" * 20)
+        print(batch["fact_token_ids"].size())
+        print("\n")
+
+        for j in range(batch["fact_token_ids"].size()[0]):
+            print("fact ids:", batch["fact_token_ids"][j])
+            print("fact seg ids:", batch["fact_seg_ids"][j])
+            print("fact att mask ids:", batch["fact_att_mask_ids"][j])
+            print("fact tokens:", tokenizer.convert_ids_to_tokens(batch["fact_token_ids"][j].tolist()))
+            print("\n")
+
+        input("AAA")

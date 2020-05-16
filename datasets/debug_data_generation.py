@@ -1,4 +1,5 @@
 import squad_retrieval
+import openbook_retrieval
 import sys
 from pathlib import Path
 from pytorch_pretrained_bert import BertTokenizer
@@ -22,5 +23,6 @@ def check_squad(check_raw_data = False, check_dataloader = False):
         squad_retrieval.check_squad_dataloader()
 
 
-check_squad(check_raw_data=False, check_dataloader=True)
+#check_squad(check_raw_data=False, check_dataloader=True)
 
+openbook_retrieval.check_openbook_dataloader()
