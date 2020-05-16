@@ -213,7 +213,7 @@ def train_and_eval_model(args, saved_pickle_path = parent_folder_path + "/data_g
                                                                    resp_list=squad_retrieval_data["resp_list"],
                                                                    tokenizer=tokenizer,
                                                                    random_seed=args.seed,
-                                                                    n_negative_sample = N_NEG_FACT)
+                                                                    n_neg_sample = N_NEG_FACT)
 
         retrieval_train_dataloader = DataLoader(squad_retrieval_train_dataset, batch_size=BATCH_SIZE_TRAIN,
                                                       shuffle=True, num_workers=NUM_WORKERS, collate_fn=squad_retrieval.PadCollateSQuADTrain())

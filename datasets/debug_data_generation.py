@@ -23,6 +23,6 @@ def check_squad(check_raw_data = False, check_dataloader = False):
         squad_retrieval.check_squad_dataloader()
 
 
-#check_squad(check_raw_data=False, check_dataloader=True)
+check_squad(check_raw_data=False, check_dataloader=True)
 
-openbook_retrieval.check_openbook_dataloader()
+#openbook_retrieval.check_openbook_dataloader()

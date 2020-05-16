@@ -360,7 +360,7 @@ class PadCollateSQuADTrain:
         """
 
     def _pad_tensor(self, vec, pad):
-        return vec + [103] * (pad - len(vec))
+        return vec + [0] * (pad - len(vec))
 
     def pad_collate(self, batch):
         # The input here is actually a list of dictionary.
@@ -369,26 +369,38 @@ class PadCollateSQuADTrain:
         # pad according to max_len
         for sample in batch:
             sample["query_token_ids"]  = self._pad_tensor(sample["query_token_ids"], pad=max_len_query)
+            sample["query_att_mask_ids"] = self._pad_tensor(sample["query_att_mask_ids"], pad=max_len_query)
+
         # stack all
 
         # the output of this function needs to be a already batched function.
         batch_returned = {}
-        batch_returned["query_token_ids"] = torch.tensor([[101]+sample["query_token_ids"]+[102] for sample in batch])
-        batch_returned["query_seg_ids"] = torch.tensor([[0]*(max_len_query+2) for sample in batch])
+        batch_returned["query_token_ids"] = torch.tensor([sample["query_token_ids"] for sample in batch])
+        batch_returned["query_att_mask_ids"] = torch.tensor([sample["query_att_mask_ids"] for sample in batch])
+        batch_returned["query_seg_ids"] = torch.tensor([[0]*max_len_query for sample in batch])
+
 
         all_facts_ids = []
+        all_facts_att_mask_ids = []
+
         for sample in batch:
             all_facts_ids.extend(sample["fact_token_ids"])
+            all_facts_att_mask_ids.extend(sample["fact_att_mask_ids"])
+
 
         max_len_fact = max([len(fact_token_ids) for fact_token_ids in all_facts_ids])
 
         for i, fact_ids in enumerate(all_facts_ids):
-            all_facts_ids[i]  = self._pad_tensor(fact_ids, pad=max_len_fact)[:min(254, max_len_fact)]   # truncate the facts to maximum 512 tokens.
+            all_facts_ids[i]  = self._pad_tensor(fact_ids, pad=max_len_fact)  # truncate the facts to maximum 512 tokens.
+        for i, fact_att_mask_ids in enumerate(all_facts_att_mask_ids):
+            all_facts_att_mask_ids[i] = self._pad_tensor(fact_att_mask_ids, pad=max_len_fact)
+
         # stack all
 
         # the output of this function needs to be a already batched function.
-        batch_returned["fact_token_ids"] = torch.tensor([[101]+fact_ids+[102] for fact_ids in all_facts_ids])
-        batch_returned["fact_seg_ids"] = torch.tensor([[0]*min(max_len_fact+2, 256) for fact_ids in all_facts_ids])
+        batch_returned["fact_token_ids"] = torch.tensor([fact_ids for fact_ids in all_facts_ids])
+        batch_returned["fact_att_mask_ids"] = torch.tensor([fact_att_mask_ids for fact_att_mask_ids in all_facts_att_mask_ids])
+        batch_returned["fact_seg_ids"] = torch.tensor([[0]*max_len_fact for fact_ids in all_facts_ids])
 
         batch_returned["label_in_distractor"] = torch.tensor([sample["label_in_distractor"] for sample in batch])
 
@@ -398,7 +410,7 @@ class PadCollateSQuADTrain:
         return self.pad_collate(batch)
 
 class SQuADRetrievalDatasetTrain(Dataset):
-    def __init__(self, instance_list, sent_list, doc_list, resp_list, tokenizer, random_seed, n_negative_sample=10):
+    def __init__(self, instance_list, sent_list, doc_list, resp_list, tokenizer, random_seed, n_neg_sample=10):
         """
         Args:
             csv_file (string): Path to the csv file with annotations.
@@ -406,28 +418,22 @@ class SQuADRetrievalDatasetTrain(Dataset):
             transform (callable, optional): Optional transform to be applied
                 on a sample.
         """
+        self.sent_list = sent_list
+        self.doc_list = doc_list
+        self.resp_list = resp_list
+        self.tokenizer = tokenizer
+        self.n_neg_sample = n_neg_sample
+
         self.instance_list=  []
         random.seed(random_seed)  # set random seed to make the negative sampling reproducible.
         for i, instance in enumerate(instance_list):
             # cls_id = 101; sep_id = 102; pad_id = 0;
             query_tokens = tokenizer.tokenize(instance["question"])   # this is for strip quotes
-            query_token_ids = tokenizer.convert_tokens_to_ids(query_tokens)   # this does not include pad, cls or sep
-
-            fact_token_ids = []
-            fact_seg_ids = []
-
-            gold_resp_index = instance["response"]
-            negative_resp_index = self._random_negative_from_kb(gold_resp_index, resp_list, n_negative_sample)
-            all_resps = [resp_list[idx] for idx in [gold_resp_index]+negative_resp_index]
-            for response_tuple in all_resps:
-                single_fact_token_ids = sent_list[response_tuple[0]]+[102]+doc_list[response_tuple[1]]
-                fact_token_ids.append(single_fact_token_ids)
-                fact_seg_ids.append([0]*len(single_fact_token_ids))  # use seg id 1 for response.
+            query_token_ids = [101] + tokenizer.convert_tokens_to_ids(query_tokens) + [102]  # this does not include pad, cls or sep
 
             instance["query_token_ids"] = query_token_ids
-            instance["query_seg_ids"] = [0]*len(query_token_ids)  # use seg id 0 for query.
-            instance["fact_token_ids"] = fact_token_ids
-            instance["fact_seg_ids"] = fact_seg_ids
+            instance["query_seg_ids"] = [0] * len(query_token_ids)  # use seg id 0 for query.
+            instance["query_att_mask_ids"] = [1] * len(query_token_ids)
 
             instance["label_in_distractor"] = 0
 
@@ -446,6 +452,24 @@ class SQuADRetrievalDatasetTrain(Dataset):
         return len(self.instance_list)
 
     def __getitem__(self, idx):
+        fact_token_ids = []
+        fact_seg_ids = []
+        fact_att_mask_ids = []
+
+        gold_resp_index = self.instance_list[idx]["response"]
+        negative_resp_index = self._random_negative_from_kb(gold_resp_index, self.resp_list, self.n_neg_sample)
+        all_resps = [self.resp_list[idx_] for idx_ in [gold_resp_index] + negative_resp_index]
+        for response_tuple in all_resps:
+            single_fact_token_ids = self.sent_list[response_tuple[0]] + [102] + self.doc_list[response_tuple[1]]
+            single_fact_token_ids = single_fact_token_ids[:min(len(single_fact_token_ids), 254)]
+            single_fact_token_ids = [101] + single_fact_token_ids + [102]
+            fact_token_ids.append(single_fact_token_ids)
+            fact_seg_ids.append([0] * len(single_fact_token_ids))  # use seg id 1 for response.
+            fact_att_mask_ids.append([1] * len(single_fact_token_ids))  # use [1] on non-pad token
+
+        self.instance_list[idx]["fact_token_ids"] = fact_token_ids
+        self.instance_list[idx]["fact_seg_ids"] = fact_seg_ids
+        self.instance_list[idx]["fact_att_mask_ids"] = fact_att_mask_ids
 
         return self.instance_list[idx]
 
@@ -455,7 +479,7 @@ class PadCollateSQuADEvalQuery:
         Nothing to add here
         """
     def _pad_tensor(self, vec, pad):
-        return vec + [103] * (pad - len(vec))
+        return vec + [0] * (pad - len(vec))
 
     def pad_collate(self, batch):
         # The input here is actually a list of dictionary.
@@ -464,12 +488,15 @@ class PadCollateSQuADEvalQuery:
         # pad according to max_len
         for sample in batch:
             sample["query_token_ids"]  = self._pad_tensor(sample["query_token_ids"], pad=max_len_query)
+            sample["query_att_mask_ids"] = self._pad_tensor(sample["query_att_mask_ids"], pad = max_len_query)
+
         # stack all
 
         # the output of this function needs to be a already batched function.
         batch_returned = {}
-        batch_returned["query_token_ids"] = torch.tensor([[101]+sample["query_token_ids"]+[102] for sample in batch])
-        batch_returned["query_seg_ids"] = torch.tensor([[0]*(max_len_query+2) for sample in batch])
+        batch_returned["query_token_ids"] = torch.tensor([sample["query_token_ids"] for sample in batch])
+        batch_returned["query_att_mask_ids"] = torch.tensor([sample["query_att_mask_ids"] for sample in batch])
+        batch_returned["query_seg_ids"] = torch.tensor([[0]*max_len_query for sample in batch])
         batch_returned["response"] = torch.tensor([sample["response"] for sample in batch])
 
         return batch_returned
@@ -490,10 +517,11 @@ class SQuADRetrievalDatasetEvalQuery(Dataset):
         for instance in instance_list:
             # cls_id = 101; sep_id = 102; pad_id = 0;
             query_tokens = tokenizer.tokenize(instance["question"])   # this is for strip quotes
-            query_token_ids = tokenizer.convert_tokens_to_ids(query_tokens)   # this does not include pad, cls or sep
+            query_token_ids = [101]+tokenizer.convert_tokens_to_ids(query_tokens)+[102]   # this does not include pad, cls or sep
 
             instance["query_token_ids"] = query_token_ids
             instance["query_seg_ids"] = [0]*len(query_token_ids)  # use seg id 0 for query.
+            instance["query_att_mask_ids"] = [1] * len(query_token_ids)
 
         self.instance_list = instance_list
 
@@ -510,23 +538,27 @@ class PadCollateSQuADEvalFact:
         """
 
     def _pad_tensor(self, vec, pad):
-        return vec + [103] * (pad - len(vec))
+        return vec + [0] * (pad - len(vec))
 
     def pad_collate(self, batch):
         # The input here is actually a list of dictionary.
         # find longest sequence
         batch_returned = {}
         all_facts_ids = []
+        all_facts_att_mask_ids = []
 
         max_len_fact = max([len(sample["fact_token_ids"]) for sample in batch])
 
         for sample in batch:
-            all_facts_ids.append(self._pad_tensor(sample["fact_token_ids"], pad=max_len_fact)[:min(254, max_len_fact)])
+            all_facts_ids.append(self._pad_tensor(sample["fact_token_ids"], pad=max_len_fact))
+            all_facts_att_mask_ids.append(self._pad_tensor(sample["fact_att_mask_ids"], pad=max_len_fact))
+
         # stack all
 
         # the output of this function needs to be a already batched function.
-        batch_returned["fact_token_ids"] = torch.tensor([[101]+fact_ids+[102] for fact_ids in all_facts_ids])
-        batch_returned["fact_seg_ids"] = torch.tensor([[0]*min(max_len_fact+2, 256) for fact_ids in all_facts_ids])
+        batch_returned["fact_token_ids"] = torch.tensor([fact_ids for fact_ids in all_facts_ids])
+        batch_returned["fact_seg_ids"] = torch.tensor([[0]*max_len_fact for fact_ids in all_facts_ids])
+        batch_returned["fact_att_mask_ids"] = torch.tensor([fact_att_mask_ids for fact_att_mask_ids in all_facts_att_mask_ids])
 
         return batch_returned
 
@@ -546,11 +578,14 @@ class SQuADRetrievalDatasetEvalFact(Dataset):
         for instance in instance_list:
             # cls_id = 101; sep_id = 102; pad_id = 0;
             fact_token_ids = sent_list[instance[0]]+[102]+doc_list[instance[1]]
+            fact_token_ids = fact_token_ids[:min(len(fact_token_ids), 254)]
+            fact_token_ids = [101] + fact_token_ids + [102]
             fact_seg_ids = [0]*len(fact_token_ids)
 
             instance_new = {}
             instance_new["fact_token_ids"] = fact_token_ids
             instance_new["fact_seg_ids"] = fact_seg_ids
+            instance_new["fact_att_mask_ids"] = [1] * len(fact_token_ids)
 
             self.instance_list.append(instance_new)
 
@@ -605,7 +640,8 @@ def check_squad_dataloader(saved_pickle_path = parent_folder_path+"/data_generat
         squad_retrieval_data = pickle.load(handle)
 
     tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
-    batch_size = 3
+    batch_size = 2
+    n_neg_fact = 3
 
     check_train = True
     check_dev = True
@@ -620,28 +656,43 @@ def check_squad_dataloader(saved_pickle_path = parent_folder_path+"/data_generat
                                                                    doc_list=squad_retrieval_data["doc_list"],
                                                                    resp_list=squad_retrieval_data["resp_list"],
                                                                    tokenizer = tokenizer,
+                                                                   n_neg_sample=n_neg_fact,
                                                                    random_seed=0)
 
         squad_retrieval_train_dataloader = DataLoader(squad_retrieval_train_dataset, batch_size=batch_size,
                                         shuffle=True, num_workers=1, collate_fn=PadCollateSQuADTrain())
 
-        samples_to_check = random.sample(list(range(len(squad_retrieval_train_dataloader))), 10)
+        samples_to_check = random.sample(list(range(len(squad_retrieval_train_dataloader))), 3)
 
 
         for i, batch in enumerate(squad_retrieval_train_dataloader):
 
             if i in samples_to_check:
-                print("\t"+"-"*20)
-                print("\tbatch size:", batch_size)
-                print("\tquery token id shape:", batch["query_token_ids"].size())
-                print("\tquery seg id shape:", batch["query_seg_ids"].size())
-                print("\tdoc token id shape:", batch["fact_token_ids"].size())
-                print("\tdoc seg id shape:", batch["fact_seg_ids"].size())
+                print(""+"-"*20)
+                print("batch size:", batch_size)
+                print("query token id shape:", batch["query_token_ids"].size())
+                print("query seg id shape:", batch["query_seg_ids"].size())
+                print("doc token id shape:", batch["fact_token_ids"].size())
+                print("doc seg id shape:", batch["fact_seg_ids"].size())
 
-                print("\tquery token id:", batch["query_token_ids"])
-                print("\tquery seg id:", batch["query_seg_ids"])
-                print("\tdoc token id:", batch["fact_token_ids"])
-                print("\tdoc seg id:", batch["fact_seg_ids"])
+                print("\n")
+
+                for j in range(batch["query_token_ids"].size()[0]):
+                    print("query ids:", batch["query_token_ids"][j])
+                    print("query seg ids:", batch["query_seg_ids"][j])
+                    print("query att mask ids:", batch["query_att_mask_ids"][j])
+                    print("query tokens:", tokenizer.convert_ids_to_tokens(batch["query_token_ids"][j].tolist()))
+                    print("\n")
+
+                    for k in range(n_neg_fact + 1):
+                        print("\tfact ids:", batch["fact_token_ids"][j * (n_neg_fact + 1) + k])
+                        print("\tfact seg ids:", batch["fact_seg_ids"][j * (n_neg_fact + 1) + k])
+                        print("\tfact att mask ids:", batch["fact_att_mask_ids"][j * (n_neg_fact + 1) + k])
+                        print("\tfact tokens:", tokenizer.convert_ids_to_tokens(
+                            batch["fact_token_ids"][j * (n_neg_fact + 1) + k].tolist()))
+                        print("\n")
+
+                input("AAA")
 
         del(squad_retrieval_train_dataset)
         del(squad_retrieval_train_dataloader)
@@ -660,7 +711,7 @@ def check_squad_dataloader(saved_pickle_path = parent_folder_path+"/data_generat
         squad_retrieval_dev_dataloader = DataLoader(squad_retrieval_dev_dataset, batch_size=batch_size,
                                                       shuffle=False, num_workers=1, collate_fn=PadCollateSQuADEvalQuery())
 
-        samples_to_check = random.sample(list(range(len(squad_retrieval_dev_dataloader))), 10)
+        samples_to_check = random.sample(list(range(len(squad_retrieval_dev_dataloader))), 3)
 
         for i, batch in enumerate(squad_retrieval_dev_dataloader):
 
@@ -670,8 +721,16 @@ def check_squad_dataloader(saved_pickle_path = parent_folder_path+"/data_generat
                 print("\tquery token id shape:", batch["query_token_ids"].size())
                 print("\tquery seg id shape:", batch["query_seg_ids"].size())
 
-                print("\tquery token id:", batch["query_token_ids"])
-                print("\tquery seg id:", batch["query_seg_ids"])
+                print("\n")
+
+                for j in range(batch["query_token_ids"].size()[0]):
+                    print("query ids:", batch["query_token_ids"][j])
+                    print("query seg ids:", batch["query_seg_ids"][j])
+                    print("query att mask ids:", batch["query_att_mask_ids"][j])
+                    print("query tokens:", tokenizer.convert_ids_to_tokens(batch["query_token_ids"][j].tolist()))
+                    print("\n")
+
+                input("AAA")
 
         del (squad_retrieval_dev_dataset)
         del (squad_retrieval_dev_dataloader)
@@ -689,7 +748,7 @@ def check_squad_dataloader(saved_pickle_path = parent_folder_path+"/data_generat
         squad_retrieval_test_dataloader = DataLoader(squad_retrieval_test_dataset, batch_size=batch_size,
                                                     shuffle=False, num_workers=1, collate_fn=PadCollateSQuADEvalQuery())
 
-        samples_to_check = random.sample(list(range(len(squad_retrieval_test_dataloader))), 10)
+        samples_to_check = random.sample(list(range(len(squad_retrieval_test_dataloader))), 3)
 
         for i, batch in enumerate(squad_retrieval_test_dataloader):
 
@@ -699,8 +758,16 @@ def check_squad_dataloader(saved_pickle_path = parent_folder_path+"/data_generat
                 print("\tquery token id shape:", batch["query_token_ids"].size())
                 print("\tquery seg id shape:", batch["query_seg_ids"].size())
 
-                print("\tquery token id:", batch["query_token_ids"])
-                print("\tquery seg id:", batch["query_seg_ids"])
+                print("\n")
+
+                for j in range(batch["query_token_ids"].size()[0]):
+                    print("query ids:", batch["query_token_ids"][j])
+                    print("query seg ids:", batch["query_seg_ids"][j])
+                    print("query att mask ids:", batch["query_att_mask_ids"][j])
+                    print("query tokens:", tokenizer.convert_ids_to_tokens(batch["query_token_ids"][j].tolist()))
+                    print("\n")
+
+                input("AAA")
 
         del (squad_retrieval_test_dataset)
         del (squad_retrieval_test_dataloader)
@@ -718,7 +785,7 @@ def check_squad_dataloader(saved_pickle_path = parent_folder_path+"/data_generat
         squad_retrieval_eval_fact_dataloader = DataLoader(squad_retrieval_eval_fact_dataset, batch_size=batch_size,
                                                       shuffle=False, num_workers=1, collate_fn=PadCollateSQuADEvalFact())
 
-        samples_to_check = random.sample(list(range(len(squad_retrieval_eval_fact_dataloader))), 10)
+        samples_to_check = random.sample(list(range(len(squad_retrieval_eval_fact_dataloader))), 3)
 
         for i, batch in enumerate(squad_retrieval_eval_fact_dataloader):
 
@@ -728,7 +795,15 @@ def check_squad_dataloader(saved_pickle_path = parent_folder_path+"/data_generat
                 print("\tdoc token id shape:", batch["fact_token_ids"].size())
                 print("\tdoc seg id shape:", batch["fact_seg_ids"].size())
 
-                print("\tdoc token id:", batch["fact_token_ids"])
-                print("\tdoc seg id:", batch["fact_seg_ids"])
+                print("\n")
+
+                for j in range(batch["fact_token_ids"].size()[0]):
+                    print("fact ids:", batch["fact_token_ids"][j])
+                    print("fact seg ids:", batch["fact_seg_ids"][j])
+                    print("fact att mask ids:", batch["fact_att_mask_ids"][j])
+                    print("fact tokens:", tokenizer.convert_ids_to_tokens(batch["fact_token_ids"][j].tolist()))
+                    print("\n")
+
+                input("AAA")
 
     return 0
