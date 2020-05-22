@@ -92,8 +92,13 @@ def main():
     tfidf_dev_result = eval_tfidf(dev_list, tfidf_vectorizer, doc_matrix, sci_kb, "dev_scores.pickle")
     tfidf_test_result =  eval_tfidf(test_list, tfidf_vectorizer, doc_matrix, sci_kb, "test_scores.pickle")
 
-    bert_dev_result = load_bert_scores(generated_data_path+"openbook_retrieval_seed_0_2020-05-16_0011/dev_dict.pickle")
-    bert_test_result = load_bert_scores(generated_data_path+"openbook_retrieval_seed_0_2020-05-16_0011/test_dict.pickle")
+    # bert_dev_result = load_bert_scores(generated_data_path+"openbook_retrieval_seed_0_2020-05-16_0011/dev_dict.pickle")
+    # bert_test_result = load_bert_scores(generated_data_path+"openbook_retrieval_seed_0_2020-05-16_0011/test_dict.pickle")
+
+    bert_dev_result = load_bert_scores(
+        generated_data_path + "openbook_retrieval_seed_1_2020-05-21_2225/dev_dict.pickle")
+    bert_test_result = load_bert_scores(
+        generated_data_path + "openbook_retrieval_seed_1_2020-05-21_2225/test_dict.pickle")
 
     performance_comparison(tfidf_dev_result, bert_dev_result, 0.5)
     performance_comparison(tfidf_test_result, bert_test_result, 0.5)
