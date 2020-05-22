@@ -456,6 +456,8 @@ class SQuADRetrievalDatasetTrain(Dataset):
         fact_seg_ids = []
         fact_att_mask_ids = []
 
+        # TODO: should not use in-batch negative sampling because it causes worse performance
+
         gold_resp_index = self.instance_list[idx]["response"]
         negative_resp_index = self._random_negative_from_kb(gold_resp_index, self.resp_list, self.n_neg_sample)
         all_resps = [self.resp_list[idx_] for idx_ in [gold_resp_index] + negative_resp_index]

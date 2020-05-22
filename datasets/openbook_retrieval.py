@@ -207,6 +207,7 @@ class OpenbookRetrievalDatasetTrain(Dataset):
     def __getitem__(self, idx):
         self.instance_list[idx]["documents"] = [self.instance_list[idx]["label"]]+random_negative_from_kb([self.instance_list[idx]["label"]], self.kb, self.num_neg_sample)
 
+        # TODO: should not use in-batch negative sampling because it causes worse performance
         fact_token_ids = []
         fact_seg_ids = []
         fact_att_mask_ids = []
@@ -483,3 +484,28 @@ def check_openbook_dataloader(n_neg_fact = 3, seed = 0, batch_size = 2, num_work
             print("\n")
 
         input("AAA")
+
+def save_openbook_pickle(n_neg_fact = 1, seed = 0):
+    train_list, dev_list, test_list, kb = construct_retrieval_dataset_openbook(
+        num_neg_sample=n_neg_fact, random_seed=seed)
+
+    for instance in dev_list:
+        instance["question"] = instance["text"]
+    for instance in test_list:
+        instance["question"] = instance["text"]
+
+    for i in range(len(kb)):
+        kb[i] = kb[i][1:-1]
+
+    print("="*20)
+    print(dev_list[0])
+    print("=" * 20)
+    print(test_list[0])
+    print("="*20)
+    print(kb[0])
+
+    with open("openbook_useqa_retrieval_data.pickle", "wb") as handle:
+        pickle.dump({"dev_list":dev_list, "test_list":test_list, "kb":kb}, handle)
+
+    return 0
+

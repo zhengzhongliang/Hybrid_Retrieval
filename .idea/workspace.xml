@@ -2,9 +2,10 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="7974c150-ca04-41f1-95a6-4f53dc884f9b" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/datasets/debug_data_generation.py" beforeDir="false" afterPath="$PROJECT_DIR$/datasets/debug_data_generation.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/datasets/nq_retrieval.py" beforeDir="false" afterPath="$PROJECT_DIR$/datasets/nq_retrieval.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/datasets/openbook_retrieval.py" beforeDir="false" afterPath="$PROJECT_DIR$/datasets/openbook_retrieval.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/datasets/squad_retrieval.py" beforeDir="false" afterPath="$PROJECT_DIR$/datasets/squad_retrieval.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/experiments_IR/train_eval_openbook_squad_nq.py" beforeDir="false" afterPath="$PROJECT_DIR$/experiments_IR/train_eval_openbook_squad_nq.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -17,8 +18,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/datasets/squad_retrieval.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="303">
-              <caret line="469" column="47" selection-start-line="469" selection-start-column="47" selection-end-line="469" selection-end-column="47" />
+            <state relative-caret-position="405">
+              <caret line="472" column="26" selection-start-line="472" selection-start-column="26" selection-end-line="472" selection-end-column="26" />
               <folding>
                 <element signature="e#0#11#0" expanded="true" />
               </folding>
@@ -26,11 +27,11 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/experiments_IR/train_eval_openbook_squad_nq.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="607">
-              <caret line="253" lean-forward="true" selection-start-line="253" selection-end-line="253" />
+            <state relative-caret-position="293">
+              <caret line="303" column="8" selection-start-line="303" selection-start-column="8" selection-end-line="303" selection-end-column="8" />
               <folding>
                 <element signature="e#0#10#0" expanded="true" />
               </folding>
@@ -39,10 +40,31 @@
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/experiments_IR/debug_eval_trained_bert.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="-2095">
+              <caret line="207" selection-start-line="207" selection-end-line="207" />
+              <folding>
+                <element signature="e#0#10#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/experiments_IR/eval_useQA.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="945">
+              <caret line="169" selection-start-line="169" selection-end-line="169" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/datasets/debug_data_generation.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="363">
-              <caret line="25" lean-forward="true" selection-start-line="25" selection-end-line="25" />
+            <state relative-caret-position="315">
+              <caret line="25" selection-start-line="25" selection-end-line="25" />
               <folding>
                 <element signature="e#0#22#0" expanded="true" />
               </folding>
@@ -52,16 +74,47 @@
       </file>
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/datasets/nq_retrieval.py">
-          <provider selected="true" editor-type-id="text-editor" />
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="7980">
+              <caret line="542" column="21" selection-start-line="542" selection-start-column="21" selection-end-line="542" selection-end-column="21" />
+              <folding>
+                <element signature="e#0#11#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/datasets/convert_nq_to_json.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="2295">
+              <caret line="159" column="8" selection-start-line="159" selection-start-column="8" selection-end-line="159" selection-end-column="8" />
+              <folding>
+                <element signature="e#1229#1244#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/datasets/openbook_retrieval.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="274">
-              <caret line="215" column="21" selection-start-line="215" selection-start-column="21" selection-end-line="215" selection-end-column="21" />
+            <state relative-caret-position="332">
+              <caret line="219" lean-forward="true" selection-start-line="219" selection-end-line="219" />
               <folding>
                 <element signature="e#0#25#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/experiments_hybrid/debug_hybrid_openbook.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="340">
+              <caret line="39" column="4" selection-start-line="39" selection-start-column="4" selection-end-line="39" selection-end-column="4" />
+              <folding>
+                <element signature="e#0#59#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -105,20 +158,25 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/datasets/nq_retrieval.py" />
         <option value="$PROJECT_DIR$/datasets/qasc_retrieval.py" />
         <option value="$PROJECT_DIR$/experiments_IR/squad_train_eval.py" />
-        <option value="$PROJECT_DIR$/datasets/openbook_retrieval.py" />
         <option value="$PROJECT_DIR$/experiments_IR/train_eval_openbook_squad_nq.py" />
         <option value="$PROJECT_DIR$/datasets/debug_data_generation.py" />
+        <option value="$PROJECT_DIR$/data_generated/openbook_useqa/check_data.py" />
+        <option value="$PROJECT_DIR$/datasets/convert_nq_to_json.py" />
+        <option value="$PROJECT_DIR$/experiments_IR/useQA_eval.py" />
+        <option value="$PROJECT_DIR$/datasets/nq_retrieval.py" />
+        <option value="$PROJECT_DIR$/experiments_IR/debug_eval_trained_bert.py" />
+        <option value="$PROJECT_DIR$/datasets/openbook_retrieval.py" />
         <option value="$PROJECT_DIR$/datasets/squad_retrieval.py" />
+        <option value="$PROJECT_DIR$/experiments_hybrid/debug_hybrid_openbook.py" />
       </list>
     </option>
   </component>
   <component name="ProjectFrameBounds">
     <option name="x" value="5" />
     <option name="y" value="23" />
-    <option name="width" value="724" />
+    <option name="width" value="870" />
     <option name="height" value="805" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
@@ -153,6 +211,11 @@
             <path>
               <item name="HybridRetrieval" type="b2602c69:ProjectViewProjectNode" />
               <item name="HybridRetrieval" type="462c0819:PsiDirectoryNode" />
+              <item name="experiments_hybrid" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="HybridRetrieval" type="b2602c69:ProjectViewProjectNode" />
+              <item name="HybridRetrieval" type="462c0819:PsiDirectoryNode" />
               <item name="experiments_IR" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
@@ -160,6 +223,15 @@
         </subPane>
       </pane>
     </panes>
+  </component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/data_generated/squad_useqa" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/data_generated/openbook_useqa" />
+      <recent name="$PROJECT_DIR$/data_generated" />
+    </key>
   </component>
   <component name="RunDashboard">
     <option name="ruleStates">
@@ -172,6 +244,34 @@
         </RuleState>
       </list>
     </option>
+  </component>
+  <component name="RunManager">
+    <configuration name="check_data" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <module name="HybridRetrieval" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/data_generated/openbook_useqa" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/data_generated/openbook_useqa/check_data.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Python.check_data" />
+      </list>
+    </recent_temporary>
   </component>
   <component name="SvnConfiguration">
     <configuration />
@@ -196,15 +296,15 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="5" y="23" width="724" height="805" extended-state="0" />
+    <frame x="5" y="23" width="870" height="805" extended-state="0" />
     <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.18065433" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.26855123" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
-      <window_info anchor="bottom" id="Run" order="2" />
+      <window_info anchor="bottom" id="Run" order="2" weight="0.32959327" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -212,19 +312,13 @@
       <window_info anchor="bottom" id="Version Control" order="7" />
       <window_info anchor="bottom" id="Terminal" order="8" visible="true" weight="0.26928473" />
       <window_info anchor="bottom" id="Event Log" order="9" side_tool="true" />
-      <window_info anchor="bottom" id="Python Console" order="10" weight="0.32916668" />
+      <window_info anchor="bottom" id="Python Console" order="10" weight="0.32819074" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
     </layout>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/datasets/nq_retrieval.py">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/datasets/qasc_retrieval.py">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
     <entry file="file://$PROJECT_DIR$/data_raw/OpenBookQA-V1-Sep2018/Data/Additional/train_complete.jsonl">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="266">
@@ -232,42 +326,102 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/datasets/openbook_retrieval.py">
+    <entry file="file://$PROJECT_DIR$/data_generated/openbook_useqa/check_data.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="274">
-          <caret line="215" column="21" selection-start-line="215" selection-start-column="21" selection-end-line="215" selection-end-column="21" />
+        <state relative-caret-position="360">
+          <caret line="25" column="85" selection-start-line="25" selection-start-column="85" selection-end-line="25" selection-end-column="85" />
           <folding>
-            <element signature="e#0#25#0" expanded="true" />
+            <element signature="e#0#18#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/datasets/debug_data_generation.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="363">
-          <caret line="25" lean-forward="true" selection-start-line="25" selection-end-line="25" />
+        <state relative-caret-position="315">
+          <caret line="25" selection-start-line="25" selection-end-line="25" />
           <folding>
             <element signature="e#0#22#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/datasets/squad_retrieval.py">
+    <entry file="file://$PROJECT_DIR$/datasets/nq_retrieval.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="303">
-          <caret line="469" column="47" selection-start-line="469" selection-start-column="47" selection-end-line="469" selection-end-column="47" />
+        <state relative-caret-position="7980">
+          <caret line="542" column="21" selection-start-line="542" selection-start-column="21" selection-end-line="542" selection-end-column="21" />
           <folding>
             <element signature="e#0#11#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/datasets/convert_nq_to_json.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="2295">
+          <caret line="159" column="8" selection-start-line="159" selection-start-column="8" selection-end-line="159" selection-end-column="8" />
+          <folding>
+            <element signature="e#1229#1244#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/datasets/qasc_retrieval.py">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/experiments_IR/eval_useQA.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="945">
+          <caret line="169" selection-start-line="169" selection-end-line="169" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/experiments_IR/train_eval_openbook_squad_nq.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="607">
-          <caret line="253" lean-forward="true" selection-start-line="253" selection-end-line="253" />
+        <state relative-caret-position="293">
+          <caret line="303" column="8" selection-start-line="303" selection-start-column="8" selection-end-line="303" selection-end-column="8" />
           <folding>
             <element signature="e#0#10#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/experiments_IR/debug_eval_trained_bert.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-2095">
+          <caret line="207" selection-start-line="207" selection-end-line="207" />
+          <folding>
+            <element signature="e#0#10#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/datasets/squad_retrieval.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="405">
+          <caret line="472" column="26" selection-start-line="472" selection-start-column="26" selection-end-line="472" selection-end-column="26" />
+          <folding>
+            <element signature="e#0#11#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/datasets/openbook_retrieval.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="332">
+          <caret line="219" lean-forward="true" selection-start-line="219" selection-end-line="219" />
+          <folding>
+            <element signature="e#0#25#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/experiments_hybrid/debug_hybrid_openbook.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="340">
+          <caret line="39" column="4" selection-start-line="39" selection-start-column="4" selection-end-line="39" selection-end-column="4" />
+          <folding>
+            <element signature="e#0#59#0" expanded="true" />
           </folding>
         </state>
       </provider>
