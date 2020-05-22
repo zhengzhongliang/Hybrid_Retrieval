@@ -11,8 +11,8 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import linear_kernel # used for compute cosine similarity for sparse matrix
 from nltk import word_tokenize
 from nltk.stem import WordNetLemmatizer
-import openbook_retrieval_utils
 import numpy as np
+import openbook_retrieval
 import os
 import pickle
 
@@ -71,7 +71,7 @@ def performance_comparison(tfidf_result, bert_mrr, threshold):
 
 
 def main():
-    train_list, dev_list, test_list, sci_kb = openbook_retrieval_utils.construct_retrieval_dataset_openbook()
+    train_list, dev_list, test_list, sci_kb = openbook_retrieval.construct_retrieval_dataset_openbook(5, 1)
 
     stop_words_list = ["i", "me", "my", "myself", "we", "our", "ours", "ourselves", "you", "your", "yours", "yourself",
                        "yourselves", "he", "him", "his", "himself", "she", "her", "hers", "herself", "it", "its",

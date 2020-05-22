@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="7974c150-ca04-41f1-95a6-4f53dc884f9b" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/experiments_hybrid/debug_hybrid_openbook.py" beforeDir="false" afterPath="$PROJECT_DIR$/experiments_hybrid/debug_hybrid_openbook.py" afterDir="false" />
-    </list>
+    <list default="true" id="7974c150-ca04-41f1-95a6-4f53dc884f9b" name="Default Changelist" comment="" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -108,8 +106,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/experiments_hybrid/debug_hybrid_openbook.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="90">
-              <caret line="6" column="57" selection-start-line="6" selection-start-column="57" selection-end-line="6" selection-end-column="57" />
+            <state relative-caret-position="324">
+              <caret line="98" column="55" selection-start-line="98" selection-start-column="55" selection-end-line="98" selection-end-column="55" />
               <folding>
                 <element signature="e#0#10#0" expanded="true" />
               </folding>
@@ -294,9 +292,8 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="5" y="23" width="870" height="805" extended-state="0" />
-    <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.26855123" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.26855123" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
@@ -307,7 +304,7 @@
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="6" weight="0.33008358" />
       <window_info anchor="bottom" id="Version Control" order="7" />
-      <window_info anchor="bottom" id="Terminal" order="8" sideWeight="0.49941108" visible="true" weight="0.26928473" />
+      <window_info active="true" anchor="bottom" id="Terminal" order="8" sideWeight="0.49941108" visible="true" weight="0.26928473" />
       <window_info anchor="bottom" id="Event Log" order="9" sideWeight="0.50058895" side_tool="true" weight="0.26928473" />
       <window_info anchor="bottom" id="Python Console" order="10" weight="0.32819074" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
@@ -415,8 +412,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/experiments_hybrid/debug_hybrid_openbook.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="90">
-          <caret line="6" column="57" selection-start-line="6" selection-start-column="57" selection-end-line="6" selection-end-column="57" />
+        <state relative-caret-position="324">
+          <caret line="98" column="55" selection-start-line="98" selection-start-column="55" selection-end-line="98" selection-end-column="55" />
           <folding>
             <element signature="e#0#10#0" expanded="true" />
           </folding>
