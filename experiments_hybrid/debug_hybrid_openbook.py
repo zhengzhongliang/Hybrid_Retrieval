@@ -1,3 +1,12 @@
+import sys
+from pathlib import Path
+import argparse
+
+parent_folder_path = str(Path('.').absolute().parent)
+datasets_folder_path = parent_folder_path+"/datasets/"
+generated_data_path = parent_folder_path+"/data_generated/"
+sys.path+=[parent_folder_path, datasets_folder_path, generated_data_path]
+
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import linear_kernel # used for compute cosine similarity for sparse matrix
 from nltk import word_tokenize
@@ -37,7 +46,28 @@ def eval_tfidf(instances_list, tfidf_vectorizer, doc_matrix, kb,  saved_file_nam
     return list_to_save
 
 def load_bert_scores(file_path):
-    with open() as handle:
+    with open(file_path, "rb") as handle:
+        result_dict = pickle.load(handle)
+
+    return result_dict["mrr"]
+
+def performance_comparison(tfidf_result, bert_mrr, threshold):
+    tfidf_mrr = [single_dict["mrr"] for single_dict in tfidf_result]
+
+    hybrid_mrr = []
+    for i, tfidf_dict in enumerate(tfidf_result):
+        if tfidf_dict["top_score"]<threshold:
+            hybrid_mrr.append(bert_mrr[i])
+        else:
+            hybrid_mrr.append(tfidf_mrr[i])
+
+    print("="*20)
+    print("threshold ", threshold)
+    print("tfidf mrr:", sum(tfidf_mrr)/len(tfidf_mrr))
+    print("bert mrr:", sum(bert_mrr)/len(bert_mrr))
+    print("hybrid mrr:", sum(hybrid_mrr)/len(hybrid_mrr))
+
+    return 0
 
 
 def main():
@@ -59,8 +89,14 @@ def main():
     doc_matrix = tfidf_vectorizer.fit_transform(
         sci_kb)
 
-    eval_tfidf(dev_list, tfidf_vectorizer, doc_matrix, sci_kb, "dev_scores.pickle")
-    eval_tfidf(test_list, tfidf_vectorizer, doc_matrix, sci_kb, "test_scores.pickle")
+    tfidf_dev_result = eval_tfidf(dev_list, tfidf_vectorizer, doc_matrix, sci_kb, "dev_scores.pickle")
+    tfidf_test_result = (test_list, tfidf_vectorizer, doc_matrix, sci_kb, "test_scores.pickle")
+
+    bert_dev_result = load_bert_scores("Openbook_retrieval_seed_0_2020-05-16_0011/dev_result.pickle")
+    bert_test_result = load_bert_scores("Openbook_retrieval_seed_0_2020-05-16_0011/test_result.pickle")
+
+    performance_comparison(tfidf_dev_result, bert_dev_result, 0.5)
+    performance_comparison(tfidf_test_result, bert_test_result, 0.5)
 
     return 0
 
