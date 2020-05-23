@@ -196,6 +196,25 @@ class OpenbookRetrievalDatasetTrain(Dataset):
 
             instance["label_in_distractor"] = 0
 
+            instance["documents"] = [instance["label"]] + random_negative_from_kb(
+                [instance["label"]], self.kb, self.num_neg_sample)
+
+            # TODO: should not use in-batch negative sampling because it causes worse performance
+            fact_token_ids = []
+            fact_seg_ids = []
+            fact_att_mask_ids = []
+            for fact_index in instance["documents"]:
+                single_fact_tokens = self.tokenizer.tokenize(
+                    self.kb[fact_index][1:-1])  # this if for removing the quotes
+                single_fact_token_ids = [101] + self.tokenizer.convert_tokens_to_ids(single_fact_tokens) + [102]
+                fact_token_ids.append(single_fact_token_ids)
+                fact_seg_ids.append([0] * len(single_fact_token_ids))
+                fact_att_mask_ids.append([1] * len(single_fact_token_ids))  # use [1] on non-pad token
+
+            instance["fact_token_ids"] = fact_token_ids
+            instance["fact_seg_ids"] = fact_seg_ids
+            instance["fact_att_mask_ids"] = fact_att_mask_ids
+
         self.instance_list = instance_list
         self.kb = kb
         self.tokenizer = tokenizer
@@ -205,22 +224,6 @@ class OpenbookRetrievalDatasetTrain(Dataset):
         return len(self.instance_list)
 
     def __getitem__(self, idx):
-        self.instance_list[idx]["documents"] = [self.instance_list[idx]["label"]]+random_negative_from_kb([self.instance_list[idx]["label"]], self.kb, self.num_neg_sample)
-
-        # TODO: should not use in-batch negative sampling because it causes worse performance
-        fact_token_ids = []
-        fact_seg_ids = []
-        fact_att_mask_ids = []
-        for fact_index in self.instance_list[idx]["documents"]:
-            single_fact_tokens = self.tokenizer.tokenize(self.kb[fact_index][1:-1])  # this if for removing the quotes
-            single_fact_token_ids = [101] + self.tokenizer.convert_tokens_to_ids(single_fact_tokens) + [102]
-            fact_token_ids.append(single_fact_token_ids)
-            fact_seg_ids.append([0] * len(single_fact_token_ids))
-            fact_att_mask_ids.append([1] * len(single_fact_token_ids))  # use [1] on non-pad token
-
-        self.instance_list[idx]["fact_token_ids"] = fact_token_ids
-        self.instance_list[idx]["fact_seg_ids"] = fact_seg_ids
-        self.instance_list[idx]["fact_att_mask_ids"] = fact_att_mask_ids
 
         return self.instance_list[idx]
 
