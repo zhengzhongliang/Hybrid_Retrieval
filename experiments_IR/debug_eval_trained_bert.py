@@ -22,6 +22,7 @@ from pytorch_pretrained_bert import BertTokenizer, BertModel
 import time
 
 import squad_retrieval, openbook_retrieval
+import train_eval_openbook_squad_nq
 import random
 import datetime
 import os
