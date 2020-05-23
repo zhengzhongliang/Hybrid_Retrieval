@@ -22,13 +22,26 @@ from pytorch_pretrained_bert import BertTokenizer, BertModel
 import time
 
 import squad_retrieval, openbook_retrieval
-import train_eval_openbook_squad_nq.BertSQuADRetriever
 import random
 import datetime
 import os
 
 def softmax(x):
     return np.exp(x) / np.sum(np.exp(x), axis=1, keepdims=True)
+
+class BertSQuADRetriever(nn.Module):
+    def __init__(self, n_neg_sample, device, batch_size_train, batch_size_eval):
+        super(BertSQuADRetriever, self).__init__()
+
+        self.bert_q = BertModel.from_pretrained('bert-base-uncased')
+        self.bert_d = BertModel.from_pretrained('bert-base-uncased')
+
+        self.criterion = torch.nn.CrossEntropyLoss()
+
+        self.n_neg_sample = n_neg_sample
+        self.device = device
+        self.batch_size_train = batch_size_train
+        self.batch_size_eval = batch_size_eval
 
 class BertEvalLoader(nn.Module):
     def __init__(self, n_neg_sample, device, batch_size_train, batch_size_eval, bert_directory = ""):
