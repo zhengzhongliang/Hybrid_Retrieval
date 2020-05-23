@@ -437,6 +437,25 @@ class SQuADRetrievalDatasetTrain(Dataset):
 
             instance["label_in_distractor"] = 0
 
+            fact_token_ids = []
+            fact_seg_ids = []
+            fact_att_mask_ids = []
+
+            gold_resp_index = instance["response"]
+            negative_resp_index = self._random_negative_from_kb(gold_resp_index, self.resp_list, self.n_neg_sample)
+            all_resps = [self.resp_list[idx_] for idx_ in [gold_resp_index] + negative_resp_index]
+            for response_tuple in all_resps:
+                single_fact_token_ids = self.sent_list[response_tuple[0]] + [102] + self.doc_list[response_tuple[1]]
+                single_fact_token_ids = single_fact_token_ids[:min(len(single_fact_token_ids), 254)]
+                single_fact_token_ids = [101] + single_fact_token_ids + [102]
+                fact_token_ids.append(single_fact_token_ids)
+                fact_seg_ids.append([0] * len(single_fact_token_ids))  # use seg id 1 for response.
+                fact_att_mask_ids.append([1] * len(single_fact_token_ids))  # use [1] on non-pad token
+
+            instance["fact_token_ids"] = fact_token_ids
+            instance["fact_seg_ids"] = fact_seg_ids
+            instance["fact_att_mask_ids"] = fact_att_mask_ids
+
         self.instance_list = instance_list
 
     def _random_negative_from_kb(self, target_fact_num, kb_as_list, num_of_negative_facts):
@@ -452,26 +471,6 @@ class SQuADRetrievalDatasetTrain(Dataset):
         return len(self.instance_list)
 
     def __getitem__(self, idx):
-        fact_token_ids = []
-        fact_seg_ids = []
-        fact_att_mask_ids = []
-
-        # TODO: should not use in-batch negative sampling because it causes worse performance
-
-        gold_resp_index = self.instance_list[idx]["response"]
-        negative_resp_index = self._random_negative_from_kb(gold_resp_index, self.resp_list, self.n_neg_sample)
-        all_resps = [self.resp_list[idx_] for idx_ in [gold_resp_index] + negative_resp_index]
-        for response_tuple in all_resps:
-            single_fact_token_ids = self.sent_list[response_tuple[0]] + [102] + self.doc_list[response_tuple[1]]
-            single_fact_token_ids = single_fact_token_ids[:min(len(single_fact_token_ids), 254)]
-            single_fact_token_ids = [101] + single_fact_token_ids + [102]
-            fact_token_ids.append(single_fact_token_ids)
-            fact_seg_ids.append([0] * len(single_fact_token_ids))  # use seg id 1 for response.
-            fact_att_mask_ids.append([1] * len(single_fact_token_ids))  # use [1] on non-pad token
-
-        self.instance_list[idx]["fact_token_ids"] = fact_token_ids
-        self.instance_list[idx]["fact_seg_ids"] = fact_seg_ids
-        self.instance_list[idx]["fact_att_mask_ids"] = fact_att_mask_ids
 
         return self.instance_list[idx]
 
