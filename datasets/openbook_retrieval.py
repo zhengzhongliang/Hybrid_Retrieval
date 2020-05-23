@@ -183,6 +183,10 @@ class OpenbookRetrievalDatasetTrain(Dataset):
             transform (callable, optional): Optional transform to be applied
                 on a sample.
         """
+        self.kb = kb
+        self.tokenizer = tokenizer
+        self.num_neg_sample = num_neg_sample
+
         self.instance_list=  []
         for instance in instance_list:
             # cls_id = 101; sep_id = 102; pad_id = 0;
@@ -216,9 +220,7 @@ class OpenbookRetrievalDatasetTrain(Dataset):
             instance["fact_att_mask_ids"] = fact_att_mask_ids
 
         self.instance_list = instance_list
-        self.kb = kb
-        self.tokenizer = tokenizer
-        self.num_neg_sample = num_neg_sample
+
 
     def __len__(self):
         return len(self.instance_list)
