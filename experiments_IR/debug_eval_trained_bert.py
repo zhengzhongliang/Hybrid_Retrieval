@@ -29,177 +29,14 @@ import os
 def softmax(x):
     return np.exp(x) / np.sum(np.exp(x), axis=1, keepdims=True)
 
-class BertRepRanker(nn.Module):
-    def __init__(self, device, scorer="dot"):
-        super(BertRepRanker, self).__init__()
-        self.device = device
-        self.tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
-
-        self.bert_q = BertModel.from_pretrained('bert-base-uncased')
-        self.bert_d = BertModel.from_pretrained('bert-base-uncased')
-
-        self.criterion = nn.CrossEntropyLoss(size_average=False)
-
-        self.scorer = scorer
-        print('Initializing model: using scorer ', self.scorer)
-        if self.scorer == "linear":
-            self.linear = nn.Linear(768 * 4, 1)
-        elif self.scorer == "MLP":
-            self.linear_1 = nn.Linear(768 * 4, 100)
-            self.linear_2 = nn.Linear(100, 1)
-
-    def get_loss(self, outputs, target):
-        loss = self.criterion(outputs.view(1, len(outputs)), target.view(1))
-        _, pred = torch.max(outputs, 0)
-        return loss, pred.detach().cpu().numpy()
-
-        # This includes the forward_all_first and forward_al_second. It returns index of top 2 retrieved facts and the loss of the whole process.
-
-    def forward(self, query, documents):
-        # This training method is borrowed from this paper: https://www.microsoft.com/en-us/research/wp-content/uploads/2016/02/cikm2013_DSSM_fullversion.pdf
-        if self.scorer == "linear":
-            input_concat = torch.cat([query.expand_as(documents), documents, query.expand_as(documents) * documents,
-                                      torch.abs(query.expand_as(documents) - documents)], dim=1)
-            scores = self.linear(input_concat).squeeze()
-        elif self.scorer == "MLP":
-            input_concat = torch.cat([query.expand_as(documents), documents, query.expand_as(documents) * documents,
-                                      torch.abs(query.expand_as(documents) - documents)], dim=1)
-            scores = self.linear_2(F.tanh(self.linear_1(input_concat))).squeeze()
-        else:
-            scores = torch.sum(query.expand_as(documents) * documents.squeeze(), dim=1)
-
-        return scores
-
-class BertRepRanker(BertRepRanker):
-    def __init__(self, device, knowledge_base, scorer="dot", context_shuffle=False):
-        super(BertRepRanker, self).__init__(device, scorer)
-        self.sci_facts_tensor_list = self.facts_to_tensor(knowledge_base)
-        self.context_shuffle = context_shuffle
-
-        # TODO: maybe we should add deep interaction later.
-        # elif self.scorer == "deep":
-
-    def query_to_tensor(self, query_list: list) -> torch.tensor:
-        # Step 1: add CLS token and SEP token to each sentence
-        # question_text = question_text.lower()
-        query_text = list(['[CLS]'])
-
-        if len(query_list) > 1:
-            context_list = query_list[:-1]
-
-            for single_query in context_list:
-                query_text.extend(single_query.split() + ['[SEP]'])
-
-            # Step 2: tokens -> ids, generate segment ids
-            tokens_context = self.tokenizer.tokenize(" ".join(query_text))
-            ids_context = self.tokenizer.convert_tokens_to_ids(tokens_context)
-            seg_ids_context = [0] * len(ids_context)
-
-            tokens_question = self.tokenizer.tokenize(query_list[-1] + " [SEP]")
-            ids_question = self.tokenizer.convert_tokens_to_ids(tokens_question)
-            seg_ids_question = [1] * len(ids_question)
-
-            # Step 3: Convert to tensor
-            CLS_id = ids_context[0]
-            all_token_ids = ids_context + ids_question
-            all_seg_ids = seg_ids_context + seg_ids_question
-
-        else:
-            query_text.extend(query_list[0].split() + ['[SEP]'])
-            all_tokens = self.tokenizer.tokenize(" ".join(query_text))
-            all_token_ids = self.tokenizer.convert_tokens_to_ids(all_tokens)
-            all_seg_ids = [0] * len(all_token_ids)
-
-            CLS_id = all_token_ids[0]
-
-        if len(all_token_ids) > 512:
-            all_token_ids = all_token_ids[-512:]
-            all_seg_ids = all_seg_ids[-512:]
-            all_token_ids[0] = CLS_id
-
-        tokens_tensor = torch.tensor([all_token_ids]).to(self.device)
-        segments_tensor = torch.tensor([all_seg_ids]).to(self.device)
-
-        return tokens_tensor, segments_tensor
-
-    # This function is to convert all science facts to Glove embedding list, later fed to GRU
-    def facts_to_tensor(self, sci_facts) -> list:
-
-        sci_facts_input_list = list([])
-        for sci_fact in sci_facts:
-            sci_fact = sci_fact  # Convert to lowercase and remove quotations.
-            input_dict = {}
-            # Step 1: add CLS token and SEP token to each sentence
-            fact_text = ["[CLS]"] + sci_fact.split() + [" . [SEP]"]
-
-            # Step 2: tokens -> ids, generate segment ids
-            tokens = self.tokenizer.tokenize(" ".join(fact_text))
-            token_ids = self.tokenizer.convert_tokens_to_ids(tokens)
-            seg_ids = [0] * len(token_ids)
-
-            # Step 3: Convert to tensor
-            tokens_tensor = torch.tensor([token_ids]).to(self.device)
-            segments_tensor = torch.tensor([seg_ids]).to(self.device)
-
-            input_dict["tokens_tensor"] = tokens_tensor
-            input_dict["segments_tensor"] = segments_tensor
-
-            sci_facts_input_list.append(input_dict)
-
-        return sci_facts_input_list
-
-    # Take the Glove embedding tensor of question-choice as input and produce sentence embedding as the output
-    def forward_query(self, question_text: list):
-        # print(question_text)
-        query_input_tensor_tokens, query_input_tensor_segments = self.query_to_tensor(question_text)
-        query_output_tensor, _ = self.bert_q(query_input_tensor_tokens, query_input_tensor_segments)
-
-        return query_output_tensor[-1][0, 0]  # Output size: batch_size * embd_size = 1*400
-
-    # Take the Glove embedding tensor of science facts as input and produce snetence embeddings as the output
-    def forward_facts(self, sci_facts_input_list):
-        sci_facts_output_list = list([])
-        for input_dict in sci_facts_input_list:
-            sci_fact_output, _ = self.bert_d(input_dict["tokens_tensor"], input_dict["segments_tensor"])
-            sci_facts_output_list.append(sci_fact_output[-1][0, 0])
-
-        sci_facts_output_tensor = torch.stack(sci_facts_output_list)
-
-        return sci_facts_output_tensor.squeeze()  # Output size:  batch_size * embd_size = 1367*400
-
-    def save_model(self, save_folder_path, doc_embedding, train_fact_score, dev_fact_score, test_fact_score, epoch):
-        # Create a folder if there is not already one.
-        if not os.path.exists(save_folder_path):
-            os.makedirs(save_folder_path)
-
-        # Save the trained model:
-        torch.save(self, save_folder_path+'/savedBertRepRanker_epoch_' + str(epoch))
-
-        # Save the fact embeddings:
-        np.save(save_folder_path+'/fact_embeddings_epoch_'+str(epoch)+'.npy', doc_embedding)
-
-        # Save the train scores:
-        with open(save_folder_path+'/train_fact_scores_epoch_'+str(epoch)+".pickle", "wb") as handle:
-            pickle.dump(train_fact_score, handle)
-
-        # Save the dev scores:
-        with open(save_folder_path + '/dev_fact_scores_epoch_' + str(epoch) + ".pickle", "wb") as handle:
-            pickle.dump(dev_fact_score, handle)
-
-        # Save the train scores:
-        with open(save_folder_path + '/test_fact_scores_epoch_' + str(epoch) + ".pickle", "wb") as handle:
-            pickle.dump(test_fact_score, handle)
-
-        return 0
-
 class BertEvalLoader(nn.Module):
-    def __init__(self, n_neg_sample, device, batch_size_train, batch_size_eval, old_bert_directory = ""):
+    def __init__(self, n_neg_sample, device, batch_size_train, batch_size_eval, bert_directory = ""):
         super(BertEvalLoader, self).__init__()
 
-        old_bert = torch.load(old_bert_directory)
+        bert_model = torch.load(bert_directory)
 
-        self.bert_q = old_bert.bert_q
-        self.bert_d = old_bert.bert_d
+        self.bert_q = bert_model.bert_q
+        self.bert_d = bert_model.bert_d
 
         self.n_neg_sample = n_neg_sample
         self.device = device
@@ -358,7 +195,7 @@ def main():
                                     device = device,
                                     batch_size_train=1,
                                     batch_size_eval=BATCH_SIZE_EVAL,
-                                    old_bert_directory="/home/zhengzhongliang/CLU_Projects/2019_QA/Learn_for_association/experiments_acl2020_trial2/saved_models/bert_openbook_retrieval_seed_0_2019-12-03_0547/savedBertRepRanker_epoch_0")
+                                    bert_directory="/home/zhengzhongliang/CLU_Projects/2019_QA/Hybrid_Retrieval/data_generated/openbook_retrieval_seed_1_2020-05-21_2225/saved_bert_retriever")
     bertEvalLoader.to(device)
 
     dev_result_dict, test_result_dict = bertEvalLoader.eval_epoch(retrieval_dev_dataloader, retrieval_test_dataloader,
