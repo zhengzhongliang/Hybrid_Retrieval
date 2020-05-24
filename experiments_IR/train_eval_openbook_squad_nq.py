@@ -207,7 +207,7 @@ def train_and_eval_model(args, saved_pickle_path = parent_folder_path + "/data_g
         # Load SQuAD dataset and dataloader.
         squad_retrieval_data = squad_retrieval.convert_squad_to_retrieval(tokenizer, random_seed = args.seed, num_dev = args.num_dev)
 
-        squad_retrieval_train_dataset = squad_retrieval.SQuADRetrievalDatasetTrain(instance_list=squad_retrieval_data["train_list"][:100],
+        squad_retrieval_train_dataset = squad_retrieval.SQuADRetrievalDatasetTrain(instance_list=squad_retrieval_data["train_list"],
                                                                    sent_list=squad_retrieval_data["sent_list"],
                                                                    doc_list=squad_retrieval_data["doc_list"],
                                                                    resp_list=squad_retrieval_data["resp_list"],
