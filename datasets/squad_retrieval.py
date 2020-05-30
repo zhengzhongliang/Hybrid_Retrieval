@@ -808,3 +808,49 @@ def check_squad_dataloader(saved_pickle_path = parent_folder_path+"/data_generat
                 input("AAA")
 
     return 0
+
+
+def generate_data_for_lucene():
+    tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
+
+    squad_retrieval_data =  convert_squad_to_retrieval(tokenizer,
+                                   squad_json_train_path=parent_folder_path + "/data_raw/SQuAD/train-v1.1.json",
+                                   squad_json_test_path=parent_folder_path + "/data_raw/SQuAD/dev-v1.1.json",
+                                   pickle_save_folder_path=parent_folder_path + "/data_generated",
+                                   pickle_save_file_path="squad_retrieval_data", random_seed=0, num_dev=2000)
+
+
+    # TODO: later generate dev queries and labels for different seeds.
+
+    dev_pool_list = squad_retrieval_data["train_list"]+squad_retrieval_data["dev_list"]
+
+    dev_indices = random.sample(range(len(dev_pool_list)), 10000)
+
+    with open('squad_dev_query.txt', 'a') as the_file:
+        for dev_idx in dev_indices:
+            the_file.write(dev_pool_list[dev_idx]["question"]+" QUERY_SEP\n ")
+
+    with open('squad_dev_label.txt', 'a') as the_file:
+        for dev_idx in dev_indices:
+            the_file.write(str(dev_pool_list[dev_idx]["response"])+"\n")
+
+    with open('squad_dev_id.txt', 'a') as the_file:
+        for dev_idx in dev_indices:
+            the_file.write(str(dev_pool_list[dev_idx]["id"])+"\n")
+
+    # print(len(squad_retrieval_data["resp_list"]))
+    # with open('squad_test_query.txt', 'a') as the_file:
+    #     for instance in squad_retrieval_data["test_list"]:
+    #         the_file.write(instance["question"]+" QUERY_SEP\n ")
+    #
+    # with open('squad_test_label.txt', 'a') as the_file:
+    #     for instance in squad_retrieval_data["test_list"]:
+    #         the_file.write(str(instance["response"])+"\n")
+
+    # with open('squad_kb.txt', 'a') as the_file:
+    #     for resp in squad_retrieval_data["resp_list"]:
+    #         the_file.write(squad_retrieval_data["sent_list_raw"][resp[0]]+" "+ squad_retrieval_data["doc_list_raw"][resp[1]] +" DOC_SEP\n ")
+
+    return 0
+
+#generate_data_for_lucene()

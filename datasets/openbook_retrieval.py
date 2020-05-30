@@ -514,3 +514,23 @@ def save_openbook_pickle(n_neg_fact = 1, seed = 0):
 
     return 0
 
+def generate_data_for_lucene():
+    train_list, dev_list, test_list, kb = construct_retrieval_dataset_openbook(1,0)
+
+    with open('openbook_dev_query.txt', 'a') as the_file:
+        for instance in dev_list:
+            the_file.write(instance["text"]+"\n")
+
+    with open('openbook_dev_label.txt', 'a') as the_file:
+        for instance in dev_list:
+            the_file.write(str(instance["label"])+"\n")
+
+    with open('openbook_test_query.txt', 'a') as the_file:
+        for instance in test_list:
+            the_file.write(instance["text"] + "\n")
+
+    with open('openbook_test_label.txt', 'a') as the_file:
+        for instance in test_list:
+            the_file.write(str(instance["label"]) + "\n")
+
+    return 0

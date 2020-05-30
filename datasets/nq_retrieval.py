@@ -590,6 +590,38 @@ def check_nq_retrieval_pickle(saved_pickle_path = parent_folder_path+"/data_gene
 
     return 0
 
+def generate_data_for_lucene():
+    tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
+
+    nq_retrieval_data =  convert_nq_to_retrieval()
+
+
+    # TODO: later generate dev queries and labels for different seeds.
+
+
+
+    print(len(nq_retrieval_data["resp_list"]))
+    print(len(nq_retrieval_data["train_list"]))
+    with open('nq_test_query.txt', 'a') as the_file:
+        for instance in nq_retrieval_data["train_list"]:
+            the_file.write(instance["question"]+" QUERY_SEP\n ")
+
+    with open('nq_test_label.txt', 'a') as the_file:
+        for instance in nq_retrieval_data["train_list"]:
+            the_file.write(str(instance["response"])+"\n")
+
+    with open('nq_test_id.txt', 'a') as the_file:
+        for instance in nq_retrieval_data["train_list"]:
+            the_file.write(str(instance["id"])+"\n")
+
+    with open('nq_kb.txt', 'a') as the_file:
+        for resp in nq_retrieval_data["resp_list"]:
+            the_file.write(nq_retrieval_data["sent_list"][resp[0]]+" "+ nq_retrieval_data["doc_list"][resp[1]] +" DOC_SEP\n ")
+
+    return 0
+
+generate_data_for_lucene()
+
 # def check_squad_dataloader(saved_pickle_path = parent_folder_path+"/data_generated/squad_retrieval_data_seed_0_dev_2000.pickle"):
 #     with open(saved_pickle_path, "rb") as handle:
 #         squad_retrieval_data = pickle.load(handle)
@@ -765,4 +797,4 @@ def check_nq_retrieval_pickle(saved_pickle_path = parent_folder_path+"/data_gene
 
 
 #convert_nq_to_retrieval()
-check_nq_retrieval_pickle()
+#check_nq_retrieval_pickle()

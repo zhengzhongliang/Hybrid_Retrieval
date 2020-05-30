@@ -1,7 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="7974c150-ca04-41f1-95a6-4f53dc884f9b" name="Default Changelist" comment="" />
+    <list default="true" id="7974c150-ca04-41f1-95a6-4f53dc884f9b" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/HybridRetrieval.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/HybridRetrieval.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/datasets/nq_retrieval.py" beforeDir="false" afterPath="$PROJECT_DIR$/datasets/nq_retrieval.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/datasets/openbook_retrieval.py" beforeDir="false" afterPath="$PROJECT_DIR$/datasets/openbook_retrieval.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/datasets/squad_retrieval.py" beforeDir="false" afterPath="$PROJECT_DIR$/datasets/squad_retrieval.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/experiments_IR/eval_useQA.py" beforeDir="false" afterPath="$PROJECT_DIR$/experiments_IR/eval_useQA_get_embeddings.py" afterDir="false" />
+    </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -11,22 +19,52 @@
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/datasets/squad_retrieval.py">
+        <entry file="file://$PROJECT_DIR$/experiments_hybrid/train_eval_hybrid_retrievers.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-11420">
-              <caret line="20" lean-forward="true" selection-start-line="20" selection-end-line="20" />
+            <state relative-caret-position="184">
+              <caret line="569" column="35" selection-start-line="569" selection-start-column="35" selection-end-line="569" selection-end-column="35" />
               <folding>
-                <element signature="e#0#11#0" expanded="true" />
+                <element signature="e#0#10#0" expanded="true" />
+                <element signature="e#6346#6588#0" />
+                <element signature="e#4745#4945#0" />
+                <element signature="e#5004#5019#0" />
+                <element signature="e#10939#11123#0" />
+                <element signature="e#13359#13400#0" />
+                <element signature="e#14357#14389#0" />
+                <element signature="e#12804#12988#0" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/experiments_IR/train_eval_openbook_squad_nq.py">
+        <entry file="file://$PROJECT_DIR$/experiments_hybrid/debug_bootstrap_resampling.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="465">
-              <caret line="31" column="31" selection-start-line="31" selection-start-column="31" selection-end-line="31" selection-end-column="31" />
+            <state relative-caret-position="184">
+              <caret line="70" column="24" selection-start-line="70" selection-start-column="24" selection-end-line="70" selection-end-column="24" />
+              <folding>
+                <element signature="e#0#10#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/experiments_probe/emnlp2020_2_probe_exp.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="246">
+              <caret line="201" selection-start-line="201" selection-end-line="201" />
+              <folding>
+                <element signature="e#0#10#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/experiments_probe/utils_dataset.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="-522">
               <folding>
                 <element signature="e#0#10#0" expanded="true" />
               </folding>
@@ -35,24 +73,10 @@
         </entry>
       </file>
       <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/experiments_IR/train_squad.sh">
-          <provider selected="true" editor-type-id="text-editor" />
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/experiments_IR/eval_useQA.py">
+        <entry file="file://$PROJECT_DIR$/experiments_probe/utils_dataset_openbook.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="2280">
-              <caret line="169" selection-start-line="169" selection-end-line="169" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/datasets/nq_retrieval.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="8130">
-              <caret line="542" column="21" selection-start-line="542" selection-start-column="21" selection-end-line="542" selection-end-column="21" />
+            <state relative-caret-position="610">
+              <caret line="119" column="52" selection-start-line="119" selection-start-column="52" selection-end-line="119" selection-end-column="52" />
               <folding>
                 <element signature="e#0#11#0" expanded="true" />
               </folding>
@@ -61,43 +85,22 @@
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/datasets/convert_nq_to_json.py">
+        <entry file="file://$PROJECT_DIR$/experiments_probe/utils_dataset_squad.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="2385">
-              <caret line="159" column="8" selection-start-line="159" selection-start-column="8" selection-end-line="159" selection-end-column="8" />
+            <state relative-caret-position="105">
+              <caret line="7" column="25" selection-start-line="7" selection-start-column="25" selection-end-line="7" selection-end-column="25" />
               <folding>
-                <element signature="e#1229#1244#0" expanded="true" />
+                <element signature="e#2#15#0" expanded="true" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/datasets/openbook_retrieval.py">
+        <entry file="file://$PROJECT_DIR$/experiments_IR/debug_dot_prod_vs_nearest_neighbor.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="2820">
-              <caret line="188" selection-start-line="188" selection-end-line="188" />
-              <folding>
-                <element signature="e#0#25#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/experiments_IR/train_openbook.sh">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="45">
-              <caret line="3" column="84" selection-start-line="3" selection-start-column="84" selection-end-line="3" selection-end-column="84" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/experiments_hybrid/debug_hybrid_openbook.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1575">
-              <caret line="105" column="32" selection-start-line="105" selection-start-column="32" selection-end-line="105" selection-end-column="32" />
+            <state relative-caret-position="231">
+              <caret line="46" column="33" selection-start-line="46" selection-start-column="33" selection-end-line="46" selection-end-column="33" />
               <folding>
                 <element signature="e#0#10#0" expanded="true" />
               </folding>
@@ -106,8 +109,27 @@
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/datasets/qasc_retrieval.py">
-          <provider selected="true" editor-type-id="text-editor" />
+        <entry file="file://$PROJECT_DIR$/experiments_IR/eval_useQA_get_mrr.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="116">
+              <caret line="193" selection-start-line="193" selection-end-line="193" />
+              <folding>
+                <element signature="e#0#10#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/experiments_hybrid/debug_dataloader.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="144">
+              <caret line="62" column="33" selection-start-line="62" selection-start-column="33" selection-end-line="62" selection-end-column="33" />
+              <folding>
+                <element signature="e#0#10#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
         </entry>
       </file>
     </leaf>
@@ -124,7 +146,6 @@
       <find>infer</find>
       <find>generate_examples</find>
       <find>sent_list</find>
-      <find>tokenizer</find>
       <find>convert_squad_to_retrieval</find>
       <find>sample</find>
       <find>np</find>
@@ -136,6 +157,10 @@
       <find>softmax</find>
       <find>epoch</find>
       <find>random</find>
+      <find>tokenizer</find>
+      <find>inf</find>
+      <find>utils_dataset</find>
+      <find>path</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -150,21 +175,34 @@
         <option value="$PROJECT_DIR$/data_generated/openbook_useqa/check_data.py" />
         <option value="$PROJECT_DIR$/datasets/convert_nq_to_json.py" />
         <option value="$PROJECT_DIR$/experiments_IR/useQA_eval.py" />
-        <option value="$PROJECT_DIR$/datasets/nq_retrieval.py" />
         <option value="$PROJECT_DIR$/experiments_hybrid/debug_hybrid_openbook.py" />
         <option value="$PROJECT_DIR$/experiments_IR/debug_eval_trained_bert.py" />
         <option value="$PROJECT_DIR$/experiments_IR/train_openbook.sh" />
-        <option value="$PROJECT_DIR$/datasets/openbook_retrieval.py" />
-        <option value="$PROJECT_DIR$/datasets/squad_retrieval.py" />
         <option value="$PROJECT_DIR$/experiments_IR/train_eval_openbook_squad_nq.py" />
+        <option value="$PROJECT_DIR$/experiments_IR/train_squad.sh" />
+        <option value="$PROJECT_DIR$/datasets/openbook_retrieval.py" />
+        <option value="$PROJECT_DIR$/experiments_IR/debug_retrieval_openbook.py" />
+        <option value="$PROJECT_DIR$/data_generated/squad_useqa/debug_squad_data.py" />
+        <option value="$PROJECT_DIR$/experiments_time/debug_1_preliminary_try.py" />
+        <option value="$PROJECT_DIR$/datasets/squad_retrieval.py" />
+        <option value="$PROJECT_DIR$/datasets/nq_retrieval.py" />
+        <option value="$PROJECT_DIR$/experiments_IR/debug_dot_prod_vs_nearest_neighbor.py" />
+        <option value="$PROJECT_DIR$/experiments_IR/eval_bert_get_mrr.py" />
+        <option value="$PROJECT_DIR$/experiments_IR/debug_search_time_distribution.py" />
+        <option value="$PROJECT_DIR$/experiments_IR/eval_useQA_get_mrr.py" />
+        <option value="$PROJECT_DIR$/experiments_IR/eval_useQA_get_time.py" />
+        <option value="$PROJECT_DIR$/experiments_hybrid/debug_dataloader.py" />
+        <option value="$PROJECT_DIR$/experiments_hybrid/train_eval_hybrid_retrievers.py" />
+        <option value="$PROJECT_DIR$/experiments_hybrid/debug_bootstrap_resampling.py" />
+        <option value="$PROJECT_DIR$/experiments_probe/utils_dataset_squad.py" />
+        <option value="$PROJECT_DIR$/experiments_probe/utils_dataset_openbook.py" />
       </list>
     </option>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="5" />
-    <option name="y" value="24" />
-    <option name="width" value="1306" />
-    <option name="height" value="805" />
+    <option name="y" value="23" />
+    <option name="width" value="1440" />
+    <option name="height" value="815" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectView">
@@ -187,22 +225,23 @@
             <path>
               <item name="HybridRetrieval" type="b2602c69:ProjectViewProjectNode" />
               <item name="HybridRetrieval" type="462c0819:PsiDirectoryNode" />
+              <item name="data_generated" type="462c0819:PsiDirectoryNode" />
+              <item name="squad_useqa" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="HybridRetrieval" type="b2602c69:ProjectViewProjectNode" />
+              <item name="HybridRetrieval" type="462c0819:PsiDirectoryNode" />
               <item name="data_raw" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="HybridRetrieval" type="b2602c69:ProjectViewProjectNode" />
               <item name="HybridRetrieval" type="462c0819:PsiDirectoryNode" />
-              <item name="datasets" type="462c0819:PsiDirectoryNode" />
+              <item name="experiments_probe" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="HybridRetrieval" type="b2602c69:ProjectViewProjectNode" />
               <item name="HybridRetrieval" type="462c0819:PsiDirectoryNode" />
-              <item name="experiments_hybrid" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="HybridRetrieval" type="b2602c69:ProjectViewProjectNode" />
-              <item name="HybridRetrieval" type="462c0819:PsiDirectoryNode" />
-              <item name="experiments_IR" type="462c0819:PsiDirectoryNode" />
+              <item name="experiments_time" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
@@ -211,13 +250,19 @@
       <pane id="Scope" />
     </panes>
   </component>
+  <component name="PropertiesComponent">
+    <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
+  </component>
   <component name="RecentsManager">
-    <key name="CopyFile.RECENT_KEYS">
-      <recent name="$PROJECT_DIR$/data_generated/squad_useqa" />
-    </key>
     <key name="MoveFile.RECENT_KEYS">
-      <recent name="$PROJECT_DIR$/data_generated/openbook_useqa" />
       <recent name="$PROJECT_DIR$/data_generated" />
+      <recent name="$PROJECT_DIR$/data_generated/useQA_results_mrr_time_openbook_squad_nq" />
+      <recent name="$PROJECT_DIR$/data_generated/squad_useqa" />
+      <recent name="$PROJECT_DIR$/data_generated/openbook_useqa" />
+    </key>
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/experiments_probe" />
+      <recent name="$PROJECT_DIR$/data_generated/squad_useqa" />
     </key>
   </component>
   <component name="RunDashboard">
@@ -232,7 +277,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager">
+  <component name="RunManager" selected="Python.debug_squad_data">
     <configuration name="check_data" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="HybridRetrieval" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -254,8 +299,30 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
+    <configuration name="debug_squad_data" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <module name="HybridRetrieval" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/data_generated/squad_useqa" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/data_generated/squad_useqa/debug_squad_data.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.debug_squad_data" />
         <item itemvalue="Python.check_data" />
       </list>
     </recent_temporary>
@@ -283,9 +350,9 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="5" y="24" width="1306" height="805" extended-state="0" />
+    <frame x="0" y="23" width="1440" height="815" extended-state="0" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.23112841" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.23326287" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
@@ -296,7 +363,7 @@
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="6" weight="0.33008358" />
       <window_info anchor="bottom" id="Version Control" order="7" />
-      <window_info anchor="bottom" id="Terminal" order="8" sideWeight="0.49941108" visible="true" weight="0.26928473" />
+      <window_info anchor="bottom" id="Terminal" order="8" sideWeight="0.49941108" visible="true" weight="0.2614108" />
       <window_info anchor="bottom" id="Event Log" order="9" sideWeight="0.50058895" side_tool="true" weight="0.26928473" />
       <window_info anchor="bottom" id="Python Console" order="10" weight="0.32819074" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
@@ -322,16 +389,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/datasets/debug_data_generation.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="315">
-          <caret line="25" selection-start-line="25" selection-end-line="25" />
-          <folding>
-            <element signature="e#0#22#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/experiments_IR/debug_eval_trained_bert.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="3255">
@@ -342,26 +399,106 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/experiments_IR/eval_useQA.py">
+    <entry file="file://$PROJECT_DIR$/experiments_IR/train_squad.sh">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2280">
-          <caret line="169" selection-start-line="169" selection-end-line="169" />
+        <state relative-caret-position="75">
+          <caret line="5" column="75" selection-start-line="5" selection-start-column="75" selection-end-line="5" selection-end-column="75" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/datasets/nq_retrieval.py">
+    <entry file="file://$PROJECT_DIR$/experiments_IR/train_openbook.sh">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="8130">
-          <caret line="542" column="21" selection-start-line="542" selection-start-column="21" selection-end-line="542" selection-end-column="21" />
+        <state relative-caret-position="30">
+          <caret line="2" selection-start-line="2" selection-end-line="2" selection-end-column="84" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/datasets/openbook_dev_query.txt" />
+    <entry file="file://$PROJECT_DIR$/datasets/squad_test_label.txt" />
+    <entry file="file://$PROJECT_DIR$/datasets/nq_test_id.txt" />
+    <entry file="file://$PROJECT_DIR$/datasets/nq_test_label.txt" />
+    <entry file="file://$PROJECT_DIR$/datasets/nq_test_query.txt" />
+    <entry file="file://$PROJECT_DIR$/datasets/nq_kb.txt" />
+    <entry file="file://$PROJECT_DIR$/experiments_time/debug_1_preliminary_try.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="330">
+          <caret line="23" selection-start-line="23" selection-end-line="23" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/data_generated/squad_useqa/debug_squad_data.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="390">
+          <caret line="26" column="41" selection-start-line="26" selection-start-column="41" selection-end-line="26" selection-end-column="41" />
           <folding>
-            <element signature="e#0#11#0" expanded="true" />
+            <element signature="e#0#18#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/experiments_IR/train_eval_openbook_squad_nq.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="2460">
+          <caret line="164" column="19" selection-start-line="164" selection-start-column="19" selection-end-line="164" selection-end-column="19" />
+          <folding>
+            <element signature="e#0#10#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/experiments_IR/debug_retrieval_openbook.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="90">
+          <caret line="6" column="37" selection-start-line="6" selection-start-column="37" selection-end-line="6" selection-end-column="37" />
+          <folding>
+            <element signature="e#0#10#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/experiments_IR/eval_useQA_get_embeddings.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="112">
+          <caret line="141" column="32" selection-start-line="141" selection-start-column="32" selection-end-line="141" selection-end-column="32" />
+          <folding>
+            <element signature="e#159#170#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/experiments_IR/debug_search_time_distribution.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="150">
+          <caret line="10" column="18" selection-start-line="10" selection-start-column="18" selection-end-line="10" selection-end-column="18" />
+          <folding>
+            <element signature="e#0#10#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/experiments_IR/eval_bert_get_mrr.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="150">
+          <caret line="10" column="59" selection-start-line="10" selection-start-column="59" selection-end-line="10" selection-end-column="59" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/experiments_IR/eval_useQA_get_time.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="426">
+          <caret line="83" column="12" selection-start-line="83" selection-start-column="12" selection-end-line="83" selection-end-column="12" />
+          <folding>
+            <element signature="e#159#170#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/data_generated/score_distribution/openbook_no_norm.png">
+      <provider selected="true" editor-type-id="images" />
+    </entry>
     <entry file="file://$PROJECT_DIR$/datasets/convert_nq_to_json.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2385">
+        <state relative-caret-position="381">
           <caret line="159" column="8" selection-start-line="159" selection-start-column="8" selection-end-line="159" selection-end-column="8" />
           <folding>
             <element signature="e#1229#1244#0" expanded="true" />
@@ -369,29 +506,33 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/datasets/openbook_retrieval.py">
+    <entry file="file://$PROJECT_DIR$/datasets/debug_data_generation.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2820">
-          <caret line="188" selection-start-line="188" selection-end-line="188" />
+        <state relative-caret-position="375">
+          <caret line="25" selection-start-line="25" selection-end-line="25" />
           <folding>
-            <element signature="e#0#25#0" expanded="true" />
+            <element signature="e#0#22#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/experiments_IR/train_openbook.sh">
+    <entry file="file://$PROJECT_DIR$/datasets/nq_retrieval.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="45">
-          <caret line="3" column="84" selection-start-line="3" selection-start-column="84" selection-end-line="3" selection-end-column="84" />
+        <state relative-caret-position="-2378">
+          <caret line="616" column="18" selection-start-line="616" selection-start-column="18" selection-end-line="616" selection-end-column="18" />
+          <folding>
+            <element signature="e#0#11#0" expanded="true" />
+            <element signature="e#13685#13714#0" />
+          </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/experiments_hybrid/debug_hybrid_openbook.py">
+    <entry file="file://$PROJECT_DIR$/datasets/openbook_retrieval.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1575">
-          <caret line="105" column="32" selection-start-line="105" selection-start-column="32" selection-end-line="105" selection-end-column="32" />
+        <state relative-caret-position="126">
+          <caret line="519" column="4" selection-start-line="519" selection-start-column="4" selection-end-line="519" selection-end-column="4" />
           <folding>
-            <element signature="e#0#10#0" expanded="true" />
+            <element signature="e#0#25#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -401,20 +542,122 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/datasets/squad_retrieval.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-11420">
-          <caret line="20" lean-forward="true" selection-start-line="20" selection-end-line="20" />
+        <state relative-caret-position="-53">
+          <caret line="828" column="54" selection-start-line="828" selection-start-column="54" selection-end-line="828" selection-end-column="54" />
           <folding>
             <element signature="e#0#11#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/experiments_IR/train_eval_openbook_squad_nq.py">
+    <entry file="file://$PROJECT_DIR$/experiments_hybrid/debug_hybrid_openbook.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="465">
-          <caret line="31" column="31" selection-start-line="31" selection-start-column="31" selection-end-line="31" selection-end-column="31" />
+        <state relative-caret-position="1590">
+          <caret line="106" selection-start-line="106" selection-end-line="106" />
           <folding>
             <element signature="e#0#10#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/experiments_IR/debug_dot_prod_vs_nearest_neighbor.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="231">
+          <caret line="46" column="33" selection-start-line="46" selection-start-column="33" selection-end-line="46" selection-end-column="33" />
+          <folding>
+            <element signature="e#0#10#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/experiments_IR/eval_useQA_get_mrr.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="116">
+          <caret line="193" selection-start-line="193" selection-end-line="193" />
+          <folding>
+            <element signature="e#0#10#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/experiments_hybrid/debug_dataloader.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="144">
+          <caret line="62" column="33" selection-start-line="62" selection-start-column="33" selection-end-line="62" selection-end-column="33" />
+          <folding>
+            <element signature="e#0#10#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/experiments_hybrid/train_eval_hybrid_retrievers.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="184">
+          <caret line="569" column="35" selection-start-line="569" selection-start-column="35" selection-end-line="569" selection-end-column="35" />
+          <folding>
+            <element signature="e#0#10#0" expanded="true" />
+            <element signature="e#6346#6588#0" />
+            <element signature="e#4745#4945#0" />
+            <element signature="e#5004#5019#0" />
+            <element signature="e#10939#11123#0" />
+            <element signature="e#13359#13400#0" />
+            <element signature="e#14357#14389#0" />
+            <element signature="e#12804#12988#0" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/experiments_hybrid/debug_bootstrap_resampling.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="184">
+          <caret line="70" column="24" selection-start-line="70" selection-start-column="24" selection-end-line="70" selection-end-column="24" />
+          <folding>
+            <element signature="e#0#10#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/experiments_probe/emnlp2020_2_probe_exp.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="246">
+          <caret line="201" selection-start-line="201" selection-end-line="201" />
+          <folding>
+            <element signature="e#0#10#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/experiments_probe/utils_dataset_squad.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="105">
+          <caret line="7" column="25" selection-start-line="7" selection-start-column="25" selection-end-line="7" selection-end-column="25" />
+          <folding>
+            <element signature="e#2#15#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/experiments_probe/utils_dataset.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-522">
+          <folding>
+            <element signature="e#0#10#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/experiments_probe/OpenBookQA-V1-Sep2018/Data/Main/dev.tsv">
+      <provider selected="true" editor-type-id="csv-text-editor" />
+      <provider editor-type-id="csv-table-editor">
+        <state showInfoPanel="true" fixedHeaders="false" rowLines="3" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/experiments_probe/utils_dataset_openbook.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="610">
+          <caret line="119" column="52" selection-start-line="119" selection-start-column="52" selection-end-line="119" selection-end-column="52" />
+          <folding>
+            <element signature="e#0#11#0" expanded="true" />
           </folding>
         </state>
       </provider>
