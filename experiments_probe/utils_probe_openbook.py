@@ -79,6 +79,8 @@ def get_vocabulary(instances_train, knowledge_base, vocab_save_path, tfidf_vecto
             del vocab_count_dict["\'\'"]
 
         for value, vocab_key in enumerate(sorted(vocab_count_dict.keys())):
+
+            #TODO: we probably do not want to include stop words in the dict.
             vocab_index_dict[vocab_key] = value
 
         total_lemma_count = sum(vocab_count_dict.values())
