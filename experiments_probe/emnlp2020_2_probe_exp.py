@@ -240,10 +240,10 @@ def experiments_openbook(device):
 
 
         # Exp5: useqa trained embedding and token remapped probe label.
-        experiment = Experiment(vocab_dict, tfidf_vectorizer, saved_result_folder_path, random_seed, model_type="useqa",
-                                input_type="query_useqa_embd", label_type="token_remap", device=device)
-        experiment.train_all(instances_all_seeds[random_seed]["train"], instances_all_seeds[random_seed]["dev"],
-                             vocab_dict, 20)
+        # experiment = Experiment(vocab_dict, tfidf_vectorizer, saved_result_folder_path, random_seed, model_type="useqa",
+        #                         input_type="query_useqa_embd", label_type="token_remap", device=device)
+        # experiment.train_all(instances_all_seeds[random_seed]["train"], instances_all_seeds[random_seed]["dev"],
+        #                      vocab_dict, 20)
 
     return 0
 
@@ -383,8 +383,8 @@ def main():
     print(device)
     print('threads after set:', torch.get_num_threads())
 
-    #experiments_openbook(device)
-    experiments_openbook_manual_check(device, data_partition="dev", label_type = "gold")
+    experiments_openbook(device)
+    #experiments_openbook_manual_check(device, data_partition="dev", label_type = "gold")
 
     return 0
 
