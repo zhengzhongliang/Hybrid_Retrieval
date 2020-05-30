@@ -263,7 +263,7 @@ def experiments_openbook_manual_check(device, data_partition = "train", print_te
         loss = torch.sum(criterion(prediction, target)*mask)/torch.sum(mask)
         return loss
 
-    probe_model_root_path = "data_generated/openbook/probe_experiment_2020-05-30_023046/"
+    probe_model_root_path = "data_generated/openbook/probe_experiment_2020-05-30_125749/"
     input_type = "query_"+embd_type+"_embd"
     probe_model_path = probe_model_root_path+"query_"+embd_type+"_embd_"+label_type+"_result_seed_"+str(seed)+"/best_linear_prober"
     saved_data_folder = 'data_generated/openbook/'
@@ -312,6 +312,15 @@ def experiments_openbook_manual_check(device, data_partition = "train", print_te
 
             output_ = linear_probe(instance[input_type].to(device))  # output size is (6600)
             output = nn.functional.sigmoid(output_)
+
+            if print_text:
+                output_numpy = output.detach().cpu().numpy()
+                top_preds = np.flip(np.argsort(output_numpy))
+                print("="*20)
+                print("\tquery:", instance["lemmas_query"])
+                print("\tfact:", instance["lemmas_fact"])
+                print('\ttop pred lemma:', [vocab_dict_rev[idx] for idx in top_preds])
+                input("A")
 
             loss = get_loss(criterion, output, torch.tensor(labels_onehot, dtype=torch.float32).to(device),
                                  torch.tensor(masks_onehot, dtype=torch.float32).to(device))
@@ -383,8 +392,8 @@ def main():
     print(device)
     print('threads after set:', torch.get_num_threads())
 
-    experiments_openbook(device)
-    #experiments_openbook_manual_check(device, data_partition="dev", label_type = "gold")
+    #experiments_openbook(device)
+    experiments_openbook_manual_check(device, data_partition="dev", label_type = "gold")
 
     return 0
 
