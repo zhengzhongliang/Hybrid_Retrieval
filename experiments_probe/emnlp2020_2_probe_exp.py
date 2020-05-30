@@ -273,7 +273,7 @@ def experiments_openbook_manual_check(device, data_partition = "train", print_te
                                                                 saved_data_folder + "openbook_vocab_dict.pickle",
                                                                 saved_data_folder + "openbook_tfidf_vectorizer.pickle")
 
-    instances_all_seeds = utils_probe_openbook.get_probe_dataset(train_list, dev_list, test_list, sci_kb, "", device,
+    instances_all_seeds = utils_probe_openbook.get_probe_dataset(train_list, dev_list, sci_kb, "",
                                                           vocab_dict, tfidf_vectorizer, saved_data_folder,
                                                           "openbook_probe.pickle")
 
