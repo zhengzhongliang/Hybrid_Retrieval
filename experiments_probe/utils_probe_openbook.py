@@ -72,18 +72,18 @@ def get_vocabulary(instances_train, knowledge_base, vocab_save_path, tfidf_vecto
                     vocab_count_dict[fact_lemma]=1
                 vocab_count_dict[fact_lemma]+=1
 
+        # Remove stop words and special tokens.
+        if "``" in vocab_count_dict:
+            del vocab_count_dict["``"]
+        if "\'\'" in vocab_count_dict:
+            del vocab_count_dict["\'\'"]
+        for stop_word in stop_words_list:
+            if stop_word in vocab_count_dict:
+                del vocab_count_dict[stop_word]
+
         #vocab_keys = sorted(list(set(vocab_keys)-set(stop_words_list)))
         for value, vocab_key in enumerate(sorted(vocab_count_dict.keys())):
             vocab_index_dict[vocab_key] = value
-
-        # Remove stop words and special tokens.
-        if "``" in vocab_index_dict:
-            del vocab_index_dict["``"]
-        if "\'\'" in vocab_index_dict:
-            del vocab_index_dict["\'\'"]
-        for stop_word in stop_words_list:
-            if stop_word in vocab_index_dict:
-                del vocab_index_dict[stop_word]
 
         total_lemma_count = sum(vocab_count_dict.values())
         for vocab_key in vocab_count_dict.keys():
