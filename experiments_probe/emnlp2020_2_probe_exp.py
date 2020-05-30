@@ -31,7 +31,7 @@ from utils import get_ppl
 
 
 class Experiment():
-    def __init__(self, vocab_dict, tfidf_vectorizer, probe_data_dir, seed, model_type = "bert", input_type = "query_bert_embd", label_type = "gold", device = "cpu"):
+    def __init__(self, vocab_dict, tfidf_vectorizer, probe_data_dir, seed, model_type = "useqa", input_type = "query_useqa_embd", label_type = "gold", device = "cpu"):
         self.seed = seed
         torch.manual_seed(seed)
 
@@ -101,8 +101,6 @@ class Experiment():
 
         print("epoch ", epoch,"\tbert total training loss:", total_loss/len(train_list))
 
-        torch.save(self.linear, save_folder_path+"bert_linear_epoch_"+str(epoch))
-
         return total_loss/len(train_list)
 
     def eval_epoch_linear_probe(self, eval_list, epoch, vocab_dict, print_sample =False):
@@ -110,7 +108,7 @@ class Experiment():
         label_binarizer.fit(range(self.target_vocab_size))
         vocab_dict_rev = {v: k for k, v in vocab_dict.items()}
         self.linear.eval()
-        total_loss = 0
+        total_loss = list([])
 
         map_list = list([])
         ppl_list = list([])
@@ -130,7 +128,7 @@ class Experiment():
                 loss = self.get_loss(output, torch.tensor(labels_onehot, dtype=torch.float32).to(self.device),
                                      torch.tensor(masks_onehot, dtype=torch.float32).to(self.device))
 
-                total_loss += loss.detach().cpu().numpy()
+                total_loss.append(loss.detach().cpu().numpy())
 
                 map_list.append(get_map(output.detach().cpu().numpy(), labels))
                 ppl_list.append(get_ppl(output.detach().cpu().numpy(), labels))
@@ -145,17 +143,19 @@ class Experiment():
                     target_map_list.append(get_map(output.detach().cpu().numpy(), target_labels_eval))
                     target_ppl_list.append(get_ppl(output.detach().cpu().numpy(), target_labels_eval))
 
-        result_dict = {"eval_loss":total_loss / len(eval_list),
-                       "avg map":sum(map_list)/len(map_list),
-                       "avg ppl":sum(ppl_list)/len(ppl_list),
-                       "query map:": sum(query_map_list)/len(query_map_list),
-                       "query ppl:": sum(query_ppl_list) / len(query_ppl_list),
-                       "target map:": sum(target_map_list) / len(target_map_list),
-                       "target ppl:": sum(target_ppl_list) / len(target_ppl_list)}
+        result_dict = {"eval_loss":total_loss,
+                       "avg map":map_list,
+                       "avg ppl":ppl_list,
+                       "query map:": query_map_list,
+                       "query ppl:": query_ppl_list,
+                       "target map:": target_map_list,
+                       "target ppl:": target_ppl_list}
         print("-" * 20)
-        print(result_dict)
+        result_summary = {x:sum(result_dict[x])/len(result_dict[x]) for x in result_dict.keys()}
 
-        return result_dict
+        print(result_summary)
+
+        return result_summary , result_dict
 
     def train_all(self, train_list, eval_list, vocab_dict, n_epoch):
         ###########################################
@@ -167,14 +167,25 @@ class Experiment():
 
         print("="*20)
         useqa_results_list = list([])
+        best_loss = 1000
         for epoch in range(n_epoch):
             train_loss = self.train_epoch_linear_probe(train_list, epoch, save_folder_path)
-            result_dict = self.eval_epoch_linear_probe( eval_list, epoch, vocab_dict)
-            result_dict["train_loss"] = train_loss
-            useqa_results_list.append(result_dict)
+            result_summary, result_dict = self.eval_epoch_linear_probe( eval_list, epoch, vocab_dict)
+            result_summary["train_loss"] = train_loss
+            useqa_results_list.append(result_summary)
             print("-" * 20)
 
-        with open(save_folder_path+"result.pickle", "wb") as handle:
+            if result_summary["eval_loss"]<best_loss:
+                best_loss= result_summary["eval_loss"]
+
+                # Save the linear probe:
+                torch.save(self.linear, save_folder_path + "bert_linear_prober")
+
+                # save the total results:
+                with open(save_folder_path + "best_epoch_result.pickle", "wb") as handle:
+                    pickle.dump(result_dict, handle)
+
+        with open(save_folder_path+"result_summary.pickle", "wb") as handle:
             pickle.dump(useqa_results_list, handle)
 
 
@@ -201,36 +212,38 @@ def experiments_openbook(device):
 
     for random_seed in range(5):
         # Exp1: useqa trained embedding and gold probe label.
-        experiment = Experiment(vocab_dict, tfidf_vectorizer, saved_result_folder_path, random_seed, model_type = "useqa", input_type = "query_useqa_embd", label_type = "gold", device = device)
-        experiment.train_all(instances_all_seeds[random_seed]["train"], instances_all_seeds[random_seed]["dev"], vocab_dict, 10)
+        experiment = Experiment(vocab_dict, tfidf_vectorizer, saved_result_folder_path, random_seed, model_type = "useqa",
+                                input_type = "query_useqa_embd", label_type = "gold", device = device)
+        experiment.train_all(instances_all_seeds[random_seed]["train"], instances_all_seeds[random_seed]["dev"],
+                             vocab_dict, 20)
 
 
         # Exp2: useqa random embedding and gold probe label.
-        experiment = Experiment(vocab_dict, tfidf_vectorizer, saved_result_folder_path, random_seed, model_type="useqa",
-                                input_type="query_random_embd", label_type="gold", device=device)
-        experiment.train_all(instances_all_seeds[random_seed]["train"], instances_all_seeds[random_seed]["dev"],
-                             vocab_dict, 10)
-
-
-        # Exp3: tf-idf embedding and gold probe label.
-        experiment = Experiment(vocab_dict, tfidf_vectorizer, saved_result_folder_path, random_seed, model_type="tfidf",
-                                input_type="query_tfidf_embd", label_type="gold", device=device)
-        experiment.train_all(instances_all_seeds[random_seed]["train"], instances_all_seeds[random_seed]["dev"],
-                             vocab_dict, 50)
-
-
-        # Exp4: useqa trained embedding and question shuffled probe label.
-        experiment = Experiment(vocab_dict, tfidf_vectorizer, saved_result_folder_path, random_seed, model_type="useqa",
-                                input_type="query_useqa_embd", label_type="ques_shuffle", device=device)
-        experiment.train_all(instances_all_seeds[random_seed]["train"], instances_all_seeds[random_seed]["dev"],
-                             vocab_dict, 10)
+        # experiment = Experiment(vocab_dict, tfidf_vectorizer, saved_result_folder_path, random_seed, model_type="useqa",
+        #                         input_type="query_random_embd", label_type="gold", device=device)
+        # experiment.train_all(instances_all_seeds[random_seed]["train"], instances_all_seeds[random_seed]["dev"],
+        #                      vocab_dict, 10)
+        #
+        #
+        # # Exp3: tf-idf embedding and gold probe label.
+        # experiment = Experiment(vocab_dict, tfidf_vectorizer, saved_result_folder_path, random_seed, model_type="tfidf",
+        #                         input_type="query_tfidf_embd", label_type="gold", device=device)
+        # experiment.train_all(instances_all_seeds[random_seed]["train"], instances_all_seeds[random_seed]["dev"],
+        #                      vocab_dict, 50)
+        #
+        #
+        # # Exp4: useqa trained embedding and question shuffled probe label.
+        # experiment = Experiment(vocab_dict, tfidf_vectorizer, saved_result_folder_path, random_seed, model_type="useqa",
+        #                         input_type="query_useqa_embd", label_type="ques_shuffle", device=device)
+        # experiment.train_all(instances_all_seeds[random_seed]["train"], instances_all_seeds[random_seed]["dev"],
+        #                      vocab_dict, 10)
 
 
         # Exp5: useqa trained embedding and token remapped probe label.
         experiment = Experiment(vocab_dict, tfidf_vectorizer, saved_result_folder_path, random_seed, model_type="useqa",
                                 input_type="query_useqa_embd", label_type="token_remap", device=device)
         experiment.train_all(instances_all_seeds[random_seed]["train"], instances_all_seeds[random_seed]["dev"],
-                             vocab_dict, 10)
+                             vocab_dict, 20)
 
     return 0
 
