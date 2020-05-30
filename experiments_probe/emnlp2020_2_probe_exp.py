@@ -374,7 +374,7 @@ def experiments_openbook_manual_check(device, data_partition = "train", print_te
     return 0
 
 def main():
-    cuda_num = sys.argv[1]
+    cuda_num = "0"
 
     print('threads before set:', torch.get_num_threads())
     torch.set_num_threads(1)
