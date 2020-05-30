@@ -247,7 +247,7 @@ def experiments_openbook(device):
 
     return 0
 
-def experiments_openbook_manual_check(device, data_partition = "train", print_text = False, embd_type = "useqa", label_type = "gold", seed = 0, epoch = 1):
+def experiments_openbook_manual_check(device, data_partition = "train", print_text = True, embd_type = "useqa", label_type = "gold", seed = 0, epoch = 1):
 
     def get_training_labels(label_binarizer, query_indices, fact_indices, negative_indices):
         label_masks = list(set(query_indices+fact_indices+negative_indices))
