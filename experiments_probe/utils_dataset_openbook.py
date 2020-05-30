@@ -90,10 +90,10 @@ def construct_dataset(train_path: str, dev_path: str, test_path: str, fact_path:
     return train_list, dev_list, test_list, sci_facts
 
 def construct_retrieval_dataset_openbook():
-    train_path = "data_raw/OpenBookQA-V1-Sep2018/Data/Additional/train_complete.jsonl"
-    dev_path = "data_raw/OpenBookQA-V1-Sep2018/Data/Additional/dev_complete.jsonl"
-    test_path = "data_raw/OpenBookQA-V1-Sep2018/Data/Additional/test_complete.jsonl"
-    fact_path = "data_raw/OpenBookQA-V1-Sep2018/Data/Main/openbook.txt"
+    train_path = "data_raw/openbook/OpenBookQA-V1-Sep2018/Data/Additional/train_complete.jsonl"
+    dev_path = "data_raw/openbook/OpenBookQA-V1-Sep2018/Data/Additional/dev_complete.jsonl"
+    test_path = "data_raw/openbook/OpenBookQA-V1-Sep2018/Data/Additional/test_complete.jsonl"
+    fact_path = "data_raw/openbook/OpenBookQA-V1-Sep2018/Data/Main/openbook.txt"
 
     # Build model:
     # Construct dataset

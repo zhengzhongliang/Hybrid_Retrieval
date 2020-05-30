@@ -18,7 +18,7 @@ sys.path+=[parent_folder_path, utils_folder_path, models_folder_path, data_folde
 import numpy as np
 
 import pickle
-import utils_dataset
+import utils_probe_openbook
 import utils_dataset_openbook
 import torch
 import time
@@ -185,13 +185,13 @@ def experiments_openbook(device):
                    parent_folder_path+'/experiments_acl2020_trial2/'+"saved_models/bert_openbook_retrieval_seed_3_2019-12-04_0102/savedBertRepRanker_epoch_0",
                    parent_folder_path+'/experiments_acl2020_trial2/'+"saved_models/bert_openbook_retrieval_seed_4_2019-12-04_0625/savedBertRepRanker_epoch_1"]
 
-    saved_data_folder = 'data/openbook/'
+    saved_data_folder = 'data_generated/openbook/'
     if not os.path.exists(saved_data_folder):
         os.mkdir(saved_data_folder)
-    train_list, dev_list, test_list, sci_kb = utils_dataset_openbook.construct_retrieval_dataset_openbook()
-    vocab_dict, tfidf_vectorizer = utils_dataset.get_vocabulary(train_list, sci_kb, saved_data_folder+"vocab_dict.pickle", saved_data_folder+"tfidf_vectorizer.pickle")
 
-    instances_all_seeds = utils_dataset.get_probe_dataset(train_list, dev_list, test_list, sci_kb, model_paths, device, vocab_dict, tfidf_vectorizer, saved_data_folder, "openbook_probe.pickle")
+    train_list, dev_list, test_list, sci_kb = utils_dataset_openbook.construct_retrieval_dataset_openbook()
+    vocab_dict, tfidf_vectorizer = utils_probe_openbook.get_vocabulary(train_list, sci_kb, saved_data_folder+"vocab_dict.pickle", saved_data_folder+"tfidf_vectorizer.pickle")
+    instances_all_seeds = utils_probe_openbook.get_probe_dataset(train_list, dev_list, test_list, sci_kb, model_paths, device, vocab_dict, tfidf_vectorizer, saved_data_folder, "openbook_probe.pickle")
 
     now = datetime.datetime.now()
     date_time = str(now)[:10] + '_' + str(now)[11:13] + str(now)[14:16] + str(now)[17:19]

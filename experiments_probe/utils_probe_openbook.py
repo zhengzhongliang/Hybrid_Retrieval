@@ -120,7 +120,7 @@ def get_shuffled_vocab_dict(vocab_dict):
 
 
 # convert the raw instances to probe instances, including add tf-idf embedding, bert embedding, random embedding, training labels and random labels.
-def instance_raw_to_probe(instances_list, kb,  model_path, device, vocab_dict, vocab_dict_shuffled, tfidf_vectorizer, save_path):
+def instance_raw_to_probe(instances_list, kb,  useqa_embd_path, device, vocab_dict, vocab_dict_shuffled, tfidf_vectorizer, save_path):
     # three types of input embeddings:
     #   trained bert embedding
     #   tf-idf embedding
@@ -130,9 +130,7 @@ def instance_raw_to_probe(instances_list, kb,  model_path, device, vocab_dict, v
     #   lemma indices of question and gold science fact of another question;
     #   lemma indices of question and gold science fact where the lemmas are replaced by a random function.
 
-    bert_rep_retriever = torch.load(model_path)
-    bert_rep_retriever.eval()
-    bert_rep_retriever.to(device)
+
 
     wnl_lemmatizer = WordNetLemmatizer()
 
