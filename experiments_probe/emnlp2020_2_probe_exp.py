@@ -263,15 +263,15 @@ def experiments_openbook_manual_check(device, data_partition = "train", print_te
         loss = torch.sum(criterion(prediction, target)*mask)/torch.sum(mask)
         return loss
 
-    probe_model_root_path = "data/openbook/probe_experiment_2020-01-29_221908/"
+    probe_model_root_path = "data_generated/openbook/probe_experiment_2020-05-30_023046/"
     input_type = "query_"+embd_type+"_embd"
-    probe_model_path = probe_model_root_path+"query_"+embd_type+"_embd_"+label_type+"_result_seed_"+str(seed)+"/"+embd_type+"_linear_epoch_"+str(epoch)
-    saved_data_folder = 'data/openbook/'
+    probe_model_path = probe_model_root_path+"query_"+embd_type+"_embd_"+label_type+"_result_seed_"+str(seed)+"/best_linear_prober"
+    saved_data_folder = 'data_generated/openbook/'
 
     train_list, dev_list, test_list, sci_kb = utils_dataset_openbook.construct_retrieval_dataset_openbook()
     vocab_dict, tfidf_vectorizer = utils_probe_openbook.get_vocabulary(train_list, sci_kb,
-                                                                saved_data_folder + "vocab_dict.pickle",
-                                                                saved_data_folder + "tfidf_vectorizer.pickle")
+                                                                saved_data_folder + "openbook_vocab_dict.pickle",
+                                                                saved_data_folder + "openbook_tfidf_vectorizer.pickle")
 
     instances_all_seeds = utils_probe_openbook.get_probe_dataset(train_list, dev_list, test_list, sci_kb, "", device,
                                                           vocab_dict, tfidf_vectorizer, saved_data_folder,
@@ -382,8 +382,8 @@ def main():
     print(device)
     print('threads after set:', torch.get_num_threads())
 
-    experiments_openbook(device)
-    #experiments_openbook_manual_check(device, data_partition="train", label_type = "gold")
+    #experiments_openbook(device)
+    experiments_openbook_manual_check(device, data_partition="dev", label_type = "gold")
 
     return 0
 
