@@ -73,9 +73,9 @@ def get_vocabulary(instances_train, knowledge_base, vocab_save_path, tfidf_vecto
                 vocab_count_dict[fact_lemma]+=1
 
         #vocab_keys = sorted(list(set(vocab_keys)-set(stop_words_list)))
-        if "``" in vocab_count_dict:
+        if "``" in vocab_index_dict:
             del vocab_count_dict["``"]
-        if "\'\'" in vocab_count_dict:
+        if "\'\'" in vocab_index_dict:
             del vocab_count_dict["\'\'"]
 
         for value, vocab_key in enumerate(sorted(vocab_count_dict.keys())):
@@ -101,10 +101,10 @@ def get_vocabulary(instances_train, knowledge_base, vocab_save_path, tfidf_vecto
         with open(tfidf_vectorizer_save_path, "wb") as handle:
             pickle.dump(tfidf_vectorizer, handle)
 
-    print("target vocab dict loading finished, size ", len(vocab_dict))
-    print("`` in vocab:", "``" in vocab_dict, "\t \'\' in vocab:", "\'\'" in vocab_dict)
-    print("vocab max:", max(vocab_dict.values()))
-    return vocab_dict, tfidf_vectorizer
+    print("target vocab dict loading finished, size ", len(vocab_dict["index_dict"]))
+    print("`` in vocab:", "``" in vocab_dict["index_dict"], "\t \'\' in vocab:", "\'\'" in vocab_dict["index_dict"])
+    print("vocab max:", max(vocab_dict["index_dict"].values()))
+    return vocab_dict["index_dict"], tfidf_vectorizer
 
 def get_negative_lemmas(input_lemmas_list, vocab_dict):
     input_lemmas_no_dup = set(input_lemmas_list)
