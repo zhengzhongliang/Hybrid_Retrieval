@@ -73,8 +73,10 @@ def get_vocabulary(instances_train, knowledge_base, vocab_save_path, tfidf_vecto
                 vocab_count_dict[fact_lemma]+=1
 
         #vocab_keys = sorted(list(set(vocab_keys)-set(stop_words_list)))
-        del vocab_count_dict["``"]
-        del vocab_count_dict["\'\'"]
+        if "``" in vocab_count_dict:
+            del vocab_count_dict["``"]
+        if "\'\'" in vocab_count_dict:
+            del vocab_count_dict["\'\'"]
 
         for value, vocab_key in enumerate(sorted(vocab_count_dict.keys())):
             vocab_index_dict[vocab_key] = value
