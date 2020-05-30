@@ -47,8 +47,8 @@ class Experiment():
         self.fact_indices = "lemma_fact_indices_"+label_type
         self.negative_indices = "lemma_negative_indices_"+label_type
 
-        if model_type=="bert":
-            self.linear = nn.Linear(768, self.target_vocab_size).to(device)
+        if model_type=="useqa":
+            self.linear = nn.Linear(512, self.target_vocab_size).to(device)
         elif model_type=="tfidf":
             self.linear = nn.Linear(self.tfidf_vocab_size, self.target_vocab_size).to(device)
 
@@ -159,39 +159,38 @@ class Experiment():
 
     def train_all(self, train_list, eval_list, vocab_dict, n_epoch):
         ###########################################
-        # train and evaluate bert linear classifier
+        # train and evaluate useqa linear classifier
         ###########################################
         save_folder_path = self.probe_data_dir+self.input_type+"_"+self.label_type+"_result_seed_"+str(self.seed)+"/"
         if not os.path.exists(save_folder_path):
             os.mkdir(save_folder_path)
 
         print("="*20)
-        bert_results_list = list([])
+        useqa_results_list = list([])
         for epoch in range(n_epoch):
             train_loss = self.train_epoch_linear_probe(train_list, epoch, save_folder_path)
             result_dict = self.eval_epoch_linear_probe( eval_list, epoch, vocab_dict)
             result_dict["train_loss"] = train_loss
-            bert_results_list.append(result_dict)
+            useqa_results_list.append(result_dict)
             print("-" * 20)
 
         with open(save_folder_path+"result.pickle", "wb") as handle:
-            pickle.dump(bert_results_list, handle)
+            pickle.dump(useqa_results_list, handle)
 
 
 def experiments_openbook(device):
-    model_paths = [parent_folder_path+'/experiments_acl2020_trial2/'+"saved_models/bert_openbook_retrieval_seed_0_2019-12-03_0547/savedBertRepRanker_epoch_0",
-                   parent_folder_path+'/experiments_acl2020_trial2/'+"saved_models/bert_openbook_retrieval_seed_1_2019-12-03_1110/savedBertRepRanker_epoch_1",
-                   parent_folder_path+'/experiments_acl2020_trial2/'+"saved_models/bert_openbook_retrieval_seed_2_2019-12-03_1633/savedBertRepRanker_epoch_0",
-                   parent_folder_path+'/experiments_acl2020_trial2/'+"saved_models/bert_openbook_retrieval_seed_3_2019-12-04_0102/savedBertRepRanker_epoch_0",
-                   parent_folder_path+'/experiments_acl2020_trial2/'+"saved_models/bert_openbook_retrieval_seed_4_2019-12-04_0625/savedBertRepRanker_epoch_1"]
+    useqa_embds_paths = {
+        "train":"data_generated/openbook/openbook_ques_train_embds.npy",
+        "dev":"data_generated/openbook/openbook_ques_dev_embds.npy"
+    }
 
     saved_data_folder = 'data_generated/openbook/'
     if not os.path.exists(saved_data_folder):
         os.mkdir(saved_data_folder)
 
     train_list, dev_list, test_list, sci_kb = utils_dataset_openbook.construct_retrieval_dataset_openbook()
-    vocab_dict, tfidf_vectorizer = utils_probe_openbook.get_vocabulary(train_list, sci_kb, saved_data_folder+"vocab_dict.pickle", saved_data_folder+"tfidf_vectorizer.pickle")
-    instances_all_seeds = utils_probe_openbook.get_probe_dataset(train_list, dev_list, test_list, sci_kb, model_paths, device, vocab_dict, tfidf_vectorizer, saved_data_folder, "openbook_probe.pickle")
+    vocab_dict, tfidf_vectorizer = utils_probe_openbook.get_vocabulary(train_list, sci_kb, saved_data_folder+"openbook_vocab_dict.pickle", saved_data_folder+"openbook_tfidf_vectorizer.pickle")
+    instances_all_seeds = utils_probe_openbook.get_probe_dataset(train_list, dev_list, sci_kb, useqa_embds_paths, vocab_dict, tfidf_vectorizer, saved_data_folder, "openbook_probe.pickle")
 
     now = datetime.datetime.now()
     date_time = str(now)[:10] + '_' + str(now)[11:13] + str(now)[14:16] + str(now)[17:19]
@@ -200,34 +199,42 @@ def experiments_openbook(device):
     if not os.path.exists(saved_result_folder_path):
         os.mkdir(saved_result_folder_path)
 
-    for random_seed in range(2):
-        # Exp1: bert trained embedding and gold probe label.
-        # experiment = Experiment(vocab_dict, tfidf_vectorizer, saved_result_folder_path, random_seed, model_type = "bert", input_type = "query_bert_embd", label_type = "gold", device = device)
-        # experiment.train_all(instances_all_seeds[random_seed]["train"], instances_all_seeds[random_seed]["dev"], vocab_dict, 10)
-        # # Exp2: bert random embedding and gold probe label.
-        # experiment = Experiment(vocab_dict, tfidf_vectorizer, saved_result_folder_path, random_seed, model_type="bert",
-        #                         input_type="query_random_embd", label_type="gold", device=device)
-        # experiment.train_all(instances_all_seeds[random_seed]["train"], instances_all_seeds[random_seed]["dev"],
-        #                      vocab_dict, 10)
+    for random_seed in range(5):
+        # Exp1: useqa trained embedding and gold probe label.
+        experiment = Experiment(vocab_dict, tfidf_vectorizer, saved_result_folder_path, random_seed, model_type = "useqa", input_type = "query_useqa_embd", label_type = "gold", device = device)
+        experiment.train_all(instances_all_seeds[random_seed]["train"], instances_all_seeds[random_seed]["dev"], vocab_dict, 10)
+
+
+        # Exp2: useqa random embedding and gold probe label.
+        experiment = Experiment(vocab_dict, tfidf_vectorizer, saved_result_folder_path, random_seed, model_type="useqa",
+                                input_type="query_random_embd", label_type="gold", device=device)
+        experiment.train_all(instances_all_seeds[random_seed]["train"], instances_all_seeds[random_seed]["dev"],
+                             vocab_dict, 10)
+
+
         # Exp3: tf-idf embedding and gold probe label.
         experiment = Experiment(vocab_dict, tfidf_vectorizer, saved_result_folder_path, random_seed, model_type="tfidf",
                                 input_type="query_tfidf_embd", label_type="gold", device=device)
         experiment.train_all(instances_all_seeds[random_seed]["train"], instances_all_seeds[random_seed]["dev"],
                              vocab_dict, 50)
-        # Exp4: bert trained embedding and question shuffled probe label.
-        experiment = Experiment(vocab_dict, tfidf_vectorizer, saved_result_folder_path, random_seed, model_type="bert",
-                                input_type="query_bert_embd", label_type="ques_shuffle", device=device)
+
+
+        # Exp4: useqa trained embedding and question shuffled probe label.
+        experiment = Experiment(vocab_dict, tfidf_vectorizer, saved_result_folder_path, random_seed, model_type="useqa",
+                                input_type="query_useqa_embd", label_type="ques_shuffle", device=device)
         experiment.train_all(instances_all_seeds[random_seed]["train"], instances_all_seeds[random_seed]["dev"],
                              vocab_dict, 10)
-        # Exp5: bert trained embedding and token remapped probe label.
-        experiment = Experiment(vocab_dict, tfidf_vectorizer, saved_result_folder_path, random_seed, model_type="bert",
-                                input_type="query_bert_embd", label_type="token_remap", device=device)
+
+
+        # Exp5: useqa trained embedding and token remapped probe label.
+        experiment = Experiment(vocab_dict, tfidf_vectorizer, saved_result_folder_path, random_seed, model_type="useqa",
+                                input_type="query_useqa_embd", label_type="token_remap", device=device)
         experiment.train_all(instances_all_seeds[random_seed]["train"], instances_all_seeds[random_seed]["dev"],
                              vocab_dict, 10)
 
     return 0
 
-def experiments_openbook_manual_check(device, data_partition = "train", print_text = False, embd_type = "bert", label_type = "gold", seed = 0, epoch = 1):
+def experiments_openbook_manual_check(device, data_partition = "train", print_text = False, embd_type = "useqa", label_type = "gold", seed = 0, epoch = 1):
 
     def get_training_labels(label_binarizer, query_indices, fact_indices, negative_indices):
         label_masks = list(set(query_indices+fact_indices+negative_indices))
@@ -249,11 +256,11 @@ def experiments_openbook_manual_check(device, data_partition = "train", print_te
     saved_data_folder = 'data/openbook/'
 
     train_list, dev_list, test_list, sci_kb = utils_dataset_openbook.construct_retrieval_dataset_openbook()
-    vocab_dict, tfidf_vectorizer = utils_dataset.get_vocabulary(train_list, sci_kb,
+    vocab_dict, tfidf_vectorizer = utils_probe_openbook.get_vocabulary(train_list, sci_kb,
                                                                 saved_data_folder + "vocab_dict.pickle",
                                                                 saved_data_folder + "tfidf_vectorizer.pickle")
 
-    instances_all_seeds = utils_dataset.get_probe_dataset(train_list, dev_list, test_list, sci_kb, "", device,
+    instances_all_seeds = utils_probe_openbook.get_probe_dataset(train_list, dev_list, test_list, sci_kb, "", device,
                                                           vocab_dict, tfidf_vectorizer, saved_data_folder,
                                                           "openbook_probe.pickle")
 

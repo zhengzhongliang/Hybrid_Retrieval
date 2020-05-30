@@ -3,7 +3,8 @@
   <component name="ChangeListManager">
     <list default="true" id="7974c150-ca04-41f1-95a6-4f53dc884f9b" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/experiments_probe/emnlp2020_2_probe_exp.py" beforeDir="false" afterPath="$PROJECT_DIR$/experiments_probe/emnlp2020_2_probe_exp.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/experiments_probe/utils_dataset.py" beforeDir="false" afterPath="$PROJECT_DIR$/experiments_probe/utils_probe_openbook.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/experiments_probe/utils_dataset_openbook.py" beforeDir="false" afterPath="$PROJECT_DIR$/experiments_probe/utils_dataset_openbook.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/experiments_probe/utils_probe_openbook.py" beforeDir="false" afterPath="$PROJECT_DIR$/experiments_probe/utils_probe_openbook.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -44,11 +45,11 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/experiments_probe/emnlp2020_2_probe_exp.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="231">
-              <caret line="191" column="174" selection-start-line="191" selection-start-column="174" selection-end-line="191" selection-end-column="174" />
+            <state relative-caret-position="520">
+              <caret line="201" column="30" selection-start-line="201" selection-start-column="30" selection-end-line="201" selection-end-column="30" />
               <folding>
                 <element signature="e#0#10#0" expanded="true" />
                 <element signature="e#12089#18321#0" />
@@ -60,9 +61,23 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/experiments_probe/utils_probe_openbook.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-1441">
+            <state relative-caret-position="1156">
+              <caret line="204" column="102" selection-start-line="204" selection-start-column="102" selection-end-line="204" selection-end-column="102" />
               <folding>
                 <element signature="e#0#10#0" expanded="true" />
+                <element signature="e#12330#14492#0" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/experiments_IR/eval_useQA_get_embeddings.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="253">
+              <caret line="146" column="44" selection-start-line="146" selection-start-column="44" selection-end-line="146" selection-end-column="44" />
+              <folding>
+                <element signature="e#159#170#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -71,8 +86,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/experiments_probe/utils_dataset_openbook.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="751">
-              <caret line="121" column="56" selection-start-line="121" selection-start-column="56" selection-end-line="121" selection-end-column="56" />
+            <state relative-caret-position="412">
+              <caret line="133" column="12" selection-start-line="133" selection-start-column="12" selection-end-line="133" selection-end-column="12" />
               <folding>
                 <element signature="e#0#11#0" expanded="true" />
               </folding>
@@ -148,15 +163,17 @@
       <find>512</find>
       <find>batch_size</find>
       <find>openbook</find>
-      <find>squad</find>
       <find>pushing an object requires</find>
       <find>softmax</find>
       <find>epoch</find>
       <find>random</find>
       <find>tokenizer</find>
       <find>inf</find>
-      <find>path</find>
       <find>utils_dataset</find>
+      <find>model_paths</find>
+      <find>bert</find>
+      <find>squad</find>
+      <find>path</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -191,8 +208,10 @@
         <option value="$PROJECT_DIR$/experiments_hybrid/train_eval_hybrid_retrievers.py" />
         <option value="$PROJECT_DIR$/experiments_hybrid/debug_bootstrap_resampling.py" />
         <option value="$PROJECT_DIR$/experiments_probe/utils_dataset_squad.py" />
-        <option value="$PROJECT_DIR$/experiments_probe/utils_dataset_openbook.py" />
+        <option value="$PROJECT_DIR$/experiments_probe/utils_probe_openbook.py" />
         <option value="$PROJECT_DIR$/experiments_probe/emnlp2020_2_probe_exp.py" />
+        <option value="$PROJECT_DIR$/experiments_probe/data_raw/openbook/OpenBookQA-V1-Sep2018/Data/Additional/generate_train_queries_for_useqa.py" />
+        <option value="$PROJECT_DIR$/experiments_probe/utils_dataset_openbook.py" />
       </list>
     </option>
   </component>
@@ -223,17 +242,30 @@
               <item name="HybridRetrieval" type="b2602c69:ProjectViewProjectNode" />
               <item name="HybridRetrieval" type="462c0819:PsiDirectoryNode" />
               <item name="data_generated" type="462c0819:PsiDirectoryNode" />
-              <item name="squad_useqa" type="462c0819:PsiDirectoryNode" />
+              <item name="openbook_useqa" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="HybridRetrieval" type="b2602c69:ProjectViewProjectNode" />
               <item name="HybridRetrieval" type="462c0819:PsiDirectoryNode" />
-              <item name="data_raw" type="462c0819:PsiDirectoryNode" />
+              <item name="experiments_IR" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="HybridRetrieval" type="b2602c69:ProjectViewProjectNode" />
               <item name="HybridRetrieval" type="462c0819:PsiDirectoryNode" />
               <item name="experiments_probe" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="HybridRetrieval" type="b2602c69:ProjectViewProjectNode" />
+              <item name="HybridRetrieval" type="462c0819:PsiDirectoryNode" />
+              <item name="experiments_probe" type="462c0819:PsiDirectoryNode" />
+              <item name="data_generated" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="HybridRetrieval" type="b2602c69:ProjectViewProjectNode" />
+              <item name="HybridRetrieval" type="462c0819:PsiDirectoryNode" />
+              <item name="experiments_probe" type="462c0819:PsiDirectoryNode" />
+              <item name="data_generated" type="462c0819:PsiDirectoryNode" />
+              <item name="openbook" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="HybridRetrieval" type="b2602c69:ProjectViewProjectNode" />
@@ -252,13 +284,14 @@
   </component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/experiments_probe/data_generated/openbook" />
+      <recent name="$PROJECT_DIR$/experiments_probe/data_raw/openbook" />
       <recent name="$PROJECT_DIR$/experiments_probe/data_raw" />
       <recent name="$PROJECT_DIR$/data_generated" />
       <recent name="$PROJECT_DIR$/data_generated/useQA_results_mrr_time_openbook_squad_nq" />
-      <recent name="$PROJECT_DIR$/data_generated/squad_useqa" />
-      <recent name="$PROJECT_DIR$/data_generated/openbook_useqa" />
     </key>
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/experiments_probe/data_generated/openbook" />
       <recent name="$PROJECT_DIR$/experiments_probe" />
       <recent name="$PROJECT_DIR$/data_generated/squad_useqa" />
     </key>
@@ -454,16 +487,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/experiments_IR/eval_useQA_get_embeddings.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="112">
-          <caret line="141" column="32" selection-start-line="141" selection-start-column="32" selection-end-line="141" selection-end-column="32" />
-          <folding>
-            <element signature="e#159#170#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/experiments_IR/debug_search_time_distribution.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="150">
@@ -625,38 +648,58 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/experiments_probe/data_raw/OpenBookQA-V1-Sep2018/Data/Main/dev.tsv">
+    <entry file="file://$PROJECT_DIR$/experiments_probe/data_raw/openbook/OpenBookQA-V1-Sep2018/Data/Main/dev.tsv">
       <provider selected="true" editor-type-id="csv-text-editor" />
       <provider editor-type-id="csv-table-editor">
         <state showInfoPanel="true" fixedHeaders="false" rowLines="3" />
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/experiments_probe/utils_probe_openbook.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1156">
+          <caret line="204" column="102" selection-start-line="204" selection-start-column="102" selection-end-line="204" selection-end-column="102" />
+          <folding>
+            <element signature="e#0#10#0" expanded="true" />
+            <element signature="e#12330#14492#0" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/experiments_probe/data_raw/openbook/OpenBookQA-V1-Sep2018/Data/Additional/generate_train_queries_for_useqa.py">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/experiments_probe/emnlp2020_2_probe_exp.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="520">
+          <caret line="201" column="30" selection-start-line="201" selection-start-column="30" selection-end-line="201" selection-end-column="30" />
+          <folding>
+            <element signature="e#0#10#0" expanded="true" />
+            <element signature="e#12089#18321#0" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/experiments_probe/data_generated/openbook/openbook_train_query.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-3739" />
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/experiments_probe/utils_dataset_openbook.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="751">
-          <caret line="121" column="56" selection-start-line="121" selection-start-column="56" selection-end-line="121" selection-end-column="56" />
+        <state relative-caret-position="412">
+          <caret line="133" column="12" selection-start-line="133" selection-start-column="12" selection-end-line="133" selection-end-column="12" />
           <folding>
             <element signature="e#0#11#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/experiments_probe/utils_probe_openbook.py">
+    <entry file="file://$PROJECT_DIR$/experiments_IR/eval_useQA_get_embeddings.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-1441">
+        <state relative-caret-position="253">
+          <caret line="146" column="44" selection-start-line="146" selection-start-column="44" selection-end-line="146" selection-end-column="44" />
           <folding>
-            <element signature="e#0#10#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/experiments_probe/emnlp2020_2_probe_exp.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="231">
-          <caret line="191" column="174" selection-start-line="191" selection-start-column="174" selection-end-line="191" selection-end-column="174" />
-          <folding>
-            <element signature="e#0#10#0" expanded="true" />
-            <element signature="e#12089#18321#0" />
+            <element signature="e#159#170#0" expanded="true" />
           </folding>
         </state>
       </provider>

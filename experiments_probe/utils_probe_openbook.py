@@ -120,7 +120,7 @@ def get_shuffled_vocab_dict(vocab_dict):
 
 
 # convert the raw instances to probe instances, including add tf-idf embedding, bert embedding, random embedding, training labels and random labels.
-def instance_raw_to_probe(instances_list, kb,  useqa_embd_path, device, vocab_dict, vocab_dict_shuffled, tfidf_vectorizer, save_path):
+def instance_raw_to_probe(instances_list, kb,  useqa_embd_path, vocab_dict, vocab_dict_shuffled, tfidf_vectorizer, save_path):
     # three types of input embeddings:
     #   trained bert embedding
     #   tf-idf embedding
@@ -130,6 +130,8 @@ def instance_raw_to_probe(instances_list, kb,  useqa_embd_path, device, vocab_di
     #   lemma indices of question and gold science fact of another question;
     #   lemma indices of question and gold science fact where the lemmas are replaced by a random function.
 
+    with open(useqa_embd_path, "rb") as handle:
+        useqa_embds = np.load(useqa_embd_path)
 
 
     wnl_lemmatizer = WordNetLemmatizer()
@@ -140,9 +142,9 @@ def instance_raw_to_probe(instances_list, kb,  useqa_embd_path, device, vocab_di
             instance_dict_probe = {}
 
             # Generate input embeddings
-            query_bert_embd = bert_rep_retriever.forward_query(instance["query"]).detach()
-            instance_dict_probe["query_bert_embd"] = query_bert_embd
-            instance_dict_probe["query_random_embd"] = torch.tensor(np.random.rand(768), dtype = torch.float32)
+            query_useqa_embd = useqa_embds[i]
+            instance_dict_probe["query_useqa_embd"] = torch.tensor(query_useqa_embd, dtype = torch.float32)
+            instance_dict_probe["query_random_embd"] = torch.tensor(np.random.rand(512), dtype = torch.float32)
             instance_dict_probe["query_tfidf_embd"] = torch.tensor(tfidf_vectorizer.transform(instance["query"]).todense(), dtype = torch.float32).squeeze()
 
             # Generate training labels for the probe task
@@ -185,7 +187,7 @@ def instance_raw_to_probe(instances_list, kb,  useqa_embd_path, device, vocab_di
 
     return instances_probe_list
 
-def get_probe_dataset(train_list, dev_list, test_list, kb, model_paths, device, vocab_dict, tfidf_vectorizer, save_path, dataset_name):
+def get_probe_dataset(train_list, dev_list,  kb, useqa_embd_paths, vocab_dict, tfidf_vectorizer, save_path, dataset_name):
     # generate data for 5 random seeds;
     # generate data for train, test and dev.
     # assert (len(model_paths) == 5)
@@ -208,9 +210,8 @@ def get_probe_dataset(train_list, dev_list, test_list, kb, model_paths, device, 
 
             # Start building the probe dataset
             instances_list_one_seed = {}
-            instances_list_one_seed["train"] = instance_raw_to_probe(train_list, kb, model_paths[random_seed], device, vocab_dict, vocab_dict_shuffled, tfidf_vectorizer, save_path)
-            instances_list_one_seed["dev"] = instance_raw_to_probe(dev_list, kb, model_paths[random_seed], device, vocab_dict, vocab_dict_shuffled, tfidf_vectorizer, save_path)
-            instances_list_one_seed["test"] = instance_raw_to_probe(test_list, kb, model_paths[random_seed], device, vocab_dict, vocab_dict_shuffled, tfidf_vectorizer, save_path)
+            instances_list_one_seed["train"] = instance_raw_to_probe(train_list, kb, useqa_embd_paths["train"], vocab_dict, vocab_dict_shuffled, tfidf_vectorizer, save_path)
+            instances_list_one_seed["dev"] = instance_raw_to_probe(dev_list, kb, useqa_embd_paths["dev"],  vocab_dict, vocab_dict_shuffled, tfidf_vectorizer, save_path)
             instances_list_one_seed["remapping_dict"] = vocab_dict_shuffled
             instances_list_all_seeds.append(instances_list_one_seed)
 

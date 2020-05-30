@@ -121,3 +121,14 @@ def construct_retrieval_dataset_openbook():
 
     return train_list, dev_list, test_list, sci_kb_clean
 
+
+def generate_query_string_for_useqa():
+
+    train_list, dev_list, test_list, sci_kb = construct_retrieval_dataset_openbook()
+
+    query_string = " ".join([instance["text"]+" \n" for instance in train_list])
+
+    with open("openbook_train_query.txt", "w") as handle:
+        handle.write(query_string)
+
+    return 0
