@@ -117,5 +117,7 @@ def construct_retrieval_dataset_openbook():
 
     print("openbook data constructed! train size:", len(train_list),"\tdev size:", len(dev_list),"\tkb size:", len(sci_kb))
 
-    return train_list, dev_list, test_list, sci_kb
+    sci_kb_clean = [fact[1:-1] for fact in sci_kb]
+
+    return train_list, dev_list, test_list, sci_kb_clean
 
