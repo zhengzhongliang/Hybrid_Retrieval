@@ -325,9 +325,9 @@ def experiments_openbook_manual_check(device, data_partition = "train", print_te
             query_ppl_list.append(get_ppl(output.detach().cpu().numpy(), np.array(instance[query_indices])))
 
             target_map_list.append(get_map(output.detach().cpu().numpy(), np.array(
-                list(set(instance[fact_indices]) - set(instance[query_indices])))))
+                list(set(instance[fact_indices]) - set(instance[query_indices])), dtype = np.int64)))
             target_ppl_list.append(get_ppl(output.detach().cpu().numpy(), np.array(
-                list(set(instance[fact_indices]) - set(instance[query_indices])))))
+                list(set(instance[fact_indices]) - set(instance[query_indices])), dtype = np.int64)))
 
             for pred_lemma_indices in list(set(instance[fact_indices]) - set(instance[query_indices])):
                 pred_lemma = vocab_dict_rev[pred_lemma_indices]
