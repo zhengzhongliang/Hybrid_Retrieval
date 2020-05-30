@@ -368,7 +368,7 @@ def experiments_openbook_manual_check(device, data_partition = "train", print_te
         pred_freq_dict_avg[k] = pred_score_dict[k]/target_occur_dict[k]
 
     tokens_sorted_by_occur = sorted(target_occur_dict.items(), key=lambda kv: kv[1])
-    for histo_tuple in list(reversed(tokens_sorted_by_occur))[:20]:
+    for histo_tuple in list(reversed(tokens_sorted_by_occur)):
         print("token:", histo_tuple[0], "\tn occur:", histo_tuple[1],"\tavg prob:",pred_freq_dict_avg[histo_tuple[0]] )
 
 
