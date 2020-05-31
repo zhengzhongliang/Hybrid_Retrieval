@@ -23,10 +23,10 @@ def generate_probe_result_openbook():
             with open(result_dict_name,"rb") as handle:
                 result_dict = pickle.load(handle)
 
-            query_map.extend(result_dict["query map"].tolist())
-            query_ppl.extend(result_dict["query ppl"].tolist())
-            target_map.extend(result_dict["target map"].tolist())
-            target_ppl.extend(result_dict["target ppl"].tolist())
+            query_map.extend(result_dict["query map:"].tolist())
+            query_ppl.extend(result_dict["query ppl:"].tolist())
+            target_map.extend(result_dict["target map:"].tolist())
+            target_ppl.extend(result_dict["target ppl:"].tolist())
 
         print("="*20)
         print(exp_name)
