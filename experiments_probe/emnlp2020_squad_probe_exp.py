@@ -116,6 +116,8 @@ class Experiment():
         query_ppl_list = list([])
         target_map_list = list([])
         target_ppl_list = list([])
+
+        overflow_count = 0
         with torch.no_grad():
             for i, instance in enumerate(eval_list):
                 labels_onehot, masks_onehot, labels, _ = self.get_training_labels(instance[self.query_indices],
@@ -138,16 +140,24 @@ class Experiment():
 
                 if len(query_labels_eval)>0:
                     query_map_list.append(get_map(output.detach().cpu().numpy(), query_labels_eval))
-                    query_ppl_list.append(get_ppl(output.detach().cpu().numpy(), query_labels_eval))
+                    query_ppl = get_ppl(output.detach().cpu().numpy(), query_labels_eval)
+                    if ~np.isinf(query_ppl):
+                        query_ppl_list.append(query_ppl)
+                    else:
+                        overflow_count+=1
                 if len(target_labels_eval)>0:
                     target_map_list.append(get_map(output.detach().cpu().numpy(), target_labels_eval))
-                    target_ppl_list.append(get_ppl(output.detach().cpu().numpy(), target_labels_eval))
+                    target_ppl = get_ppl(output.detach().cpu().numpy(), target_labels_eval)
+                    if ~np.isinf(target_ppl):
+                        target_ppl_list.append(target_ppl)
+                    else:
+                        overflow_count+=1
 
-                if len(query_ppl_list)>0 and np.isinf(query_ppl_list[-1]):
+                if len(target_ppl_list)>0 and np.isinf(target_ppl_list[-1]):
                     print("="*20)
                     print("\tquery", instance["query"])
                     print("\toutput sum", torch.sum(output))
-                    print("\tlabel sum:", query_labels_eval)
+                    print("\tlabel sum:", np.sum(target_labels_eval))
                     print("\t", self.query_indices)
                     print("\t", self.fact_indices)
                     input("AA")
@@ -163,6 +173,7 @@ class Experiment():
         result_summary = {x:sum(result_dict[x])/len(result_dict[x]) for x in result_dict.keys()}
 
         print(result_summary)
+        print(overflow_count)
 
         return result_summary , result_dict
 
