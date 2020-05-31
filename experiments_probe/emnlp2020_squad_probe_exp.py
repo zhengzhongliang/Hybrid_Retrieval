@@ -143,6 +143,15 @@ class Experiment():
                     target_map_list.append(get_map(output.detach().cpu().numpy(), target_labels_eval))
                     target_ppl_list.append(get_ppl(output.detach().cpu().numpy(), target_labels_eval))
 
+                if len(query_ppl_list)>0 and np.isinf(query_ppl_list[-1]):
+                    print("="*20)
+                    print("\tquery", instance["query"])
+                    print("\toutput sum", torch.sum(output))
+                    print("\tlabel sum:", query_labels_eval)
+                    print("\t", self.query_indices)
+                    print("\t", self.fact_indices)
+                    input("AA")
+
         result_dict = {"eval_loss":total_loss,
                        "avg map":map_list,
                        "avg ppl":ppl_list,
