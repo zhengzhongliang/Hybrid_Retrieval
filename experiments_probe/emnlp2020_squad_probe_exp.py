@@ -231,28 +231,28 @@ def experiments_squad(device):
         os.mkdir(saved_result_folder_path)
 
     for random_seed in range(5):
-        # Exp1: useqa trained embedding and gold probe label.
+        # Exp1: useqa trained embedding and gold probe label. Best @ epoch 2
         experiment = Experiment(vocab_dict, tfidf_vectorizer, saved_result_folder_path, random_seed, model_type = "useqa",
                                 input_type = "query_useqa_embd", label_type = "gold", device = device)
         experiment.train_all(instances_all_seeds[random_seed]["train"], instances_all_seeds[random_seed]["dev"],
                              vocab_dict, 5)
 
 
-        # Exp2: useqa random embedding and gold probe label.
+        # Exp2: useqa random embedding and gold probe label. Best @ epoch 0
         experiment = Experiment(vocab_dict, tfidf_vectorizer, saved_result_folder_path, random_seed, model_type="useqa",
                                 input_type="query_random_embd", label_type="gold", device=device)
         experiment.train_all(instances_all_seeds[random_seed]["train"], instances_all_seeds[random_seed]["dev"],
-                             vocab_dict, 5)
+                             vocab_dict, 3)
 
 
-        # Exp3: tf-idf embedding and gold probe label.
+        # Exp3: tf-idf embedding and gold probe label.  Best @ epoch epoch 2
         experiment = Experiment(vocab_dict, tfidf_vectorizer, saved_result_folder_path, random_seed, model_type="tfidf",
                                 input_type="query_tfidf_embd", label_type="gold", device=device)
         experiment.train_all(instances_all_seeds[random_seed]["train"], instances_all_seeds[random_seed]["dev"],
-                             vocab_dict, 10)
+                             vocab_dict, 6)
 
 
-        # Exp4: useqa trained embedding and question shuffled probe label.
+        # Exp4: useqa trained embedding and question shuffled probe label. Best @ epoch
         experiment = Experiment(vocab_dict, tfidf_vectorizer, saved_result_folder_path, random_seed, model_type="useqa",
                                 input_type="query_useqa_embd", label_type="ques_shuffle", device=device)
         experiment.train_all(instances_all_seeds[random_seed]["train"], instances_all_seeds[random_seed]["dev"],
@@ -283,7 +283,7 @@ def experiments_squad_manual_check(device, data_partition = "train", print_text 
         loss = torch.sum(criterion(prediction, target)*mask)/torch.sum(mask)
         return loss
 
-    probe_model_root_path = "data_generated/squad/probe_experiment_2020-05-30_125749/"
+    probe_model_root_path = "data_generated/squad/probe_experiment_2020-05-30_215643/"
     input_type = "query_"+embd_type+"_embd"
     probe_model_path = probe_model_root_path+"query_"+embd_type+"_embd_"+label_type+"_result_seed_"+str(seed)+"/best_linear_prober"
     saved_data_folder = 'data_generated/squad/'
@@ -412,8 +412,8 @@ def main():
     print(device)
     print('threads after set:', torch.get_num_threads())
 
-    experiments_squad(device)
-    #experiments_squad_manual_check(device, data_partition="dev", print_text = True, label_type = "gold")
+    #experiments_squad(device)
+    experiments_squad_manual_check(device, data_partition="dev", print_text = True, label_type = "gold")
 
     return 0
 
