@@ -18,7 +18,7 @@ def generate_probe_result_openbook():
         target_map = []
         target_ppl = []
         for seed in range(5):
-            result_dict_name = exp_folder_paths[exp_name]+str(seed)+"/result_dict.pickle"
+            result_dict_name = root_foler_path+exp_folder_paths[exp_name]+str(seed)+"/result_dict.pickle"
 
             with open(result_dict_name,"rb") as handle:
                 result_dict = pickle.load(handle)
