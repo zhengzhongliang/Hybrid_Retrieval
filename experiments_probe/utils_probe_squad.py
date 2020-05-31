@@ -81,11 +81,12 @@ def get_vocabulary(instances_train, knowledge_base, vocab_save_path, tfidf_vecto
             if stop_word in vocab_count_dict:
                 del vocab_count_dict[stop_word]
 
-        vocab_count_dict = {k:vocab_count_dict[k] for k in vocab_count_dict.keys() if vocab_count_dict[k]>5}
+        vocab_count_dict = {k:vocab_count_dict[k] for k in sorted(vocab_count_dict, key=vocab_count_dict.get, reverse=True)}
 
         #vocab_keys = sorted(list(set(vocab_keys)-set(stop_words_list)))
-        for value, vocab_key in enumerate(sorted(vocab_count_dict.keys())):
-            vocab_index_dict[vocab_key] = value
+        for value, vocab_key in enumerate(vocab_count_dict.keys()):
+            if value<10000:
+                vocab_index_dict[vocab_key] = value
 
         total_lemma_count = sum(vocab_count_dict.values())
         for vocab_key in vocab_count_dict.keys():
@@ -102,7 +103,7 @@ def get_vocabulary(instances_train, knowledge_base, vocab_save_path, tfidf_vecto
             tfidf_vectorizer = pickle.load(handle)
     else:
 
-        tfidf_vectorizer = TfidfVectorizer(stop_words=stop_words_list, tokenizer=LemmaTokenizer(), min_df = 3)
+        tfidf_vectorizer = TfidfVectorizer(stop_words=stop_words_list, tokenizer=LemmaTokenizer(), min_df = 5)
         doc_matrix = tfidf_vectorizer.fit_transform(knowledge_base)
         with open(tfidf_vectorizer_save_path, "wb") as handle:
             pickle.dump(tfidf_vectorizer, handle)
@@ -184,9 +185,15 @@ def instance_raw_to_probe(instances_list, kb,  useqa_embd_path, vocab_dict, voca
             # Generate question id
             instance_dict_probe["id"] = instance["id"]
 
-            instances_probe_list.append(instance_dict_probe)
+            a = (len(instance_dict_probe["lemma_query_indices_gold"]) != 0)
+            b = (len(instance_dict_probe["lemma_fact_indices_gold"]) != 0)
+            c = (len(instance_dict_probe["lemma_negative_indices_gold"]) != 0)
 
-        resample_control_indices = list(range(len(instances_list)))
+            if a and b and c:
+
+                instances_probe_list.append(instance_dict_probe)
+
+        resample_control_indices = list(range(len(instances_probe_list)))
         random.shuffle(resample_control_indices)
         for i, instance in enumerate(instances_probe_list):
             instance["lemma_query_indices_ques_shuffle"] = instances_probe_list[resample_control_indices[i]]["lemma_query_indices_gold"]
@@ -207,6 +214,7 @@ def get_probe_dataset(train_list, dev_list,  kb, useqa_embd_paths, vocab_dict, t
     else:
         instances_list_all_seeds = list([])
 
+        # TODO: change this back to 5 before formal experiments.
         for random_seed in range(5):
             print("Generating probe dataset of seed ", random_seed, " ...")
             # Set the random seed to ensure reproducibility
