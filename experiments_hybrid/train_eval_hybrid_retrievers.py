@@ -329,11 +329,77 @@ class LogisticRegressionRouter():
 
         return train_array, labels
 
-class LogisticFullSum():
-    def __init__(self):
-        # TODO later implement this.
-        a = 1
+class LinearSum():
 
+    def __init__(self, bm25_dev_dict, useqa_dev_dict, dataset):
+        self.dataset = dataset
+        self.best_coef = self._get_best_linear_coefficient(bm25_dev_dict, useqa_dev_dict)
+
+    def _get_best_linear_coefficient(self, bm25_dev_dict, useqa_dev_dict):
+        print("looking for the best coefficient for linear combination ...")
+        best_mrr = 0
+        best_coef = 0
+        for coef in np.arange(0, 1.1, 0.1):
+            mrr_array, _ = self._reranking_by_linear_combination(bm25_dev_dict, useqa_dev_dict, coef)
+            if np.mean(mrr_array)>best_mrr:
+                best_mrr = np.mean(mrr_array)
+                best_coef = coef
+
+        print("best coef:", best_coef)
+
+        return best_coef
+
+    def _reranking_by_linear_combination(self, bm25_result_dict, useqa_result_dict, coef):
+        mrr_list = []
+        time_list = []
+
+        # this uses softmax over all retrieved top 2000 facts. Maybe we should also try that on hyrbid lr model.
+        for sample_idx in range(len(bm25_result_dict["mrr"])):
+            start_time = time.time()
+            gold_label = useqa_result_dict["gold_fact_index"][sample_idx]
+
+            bm25_score_recon = np.zeros(dataset_statistics[self.dataset]["n_kb"])  # get how many facts in total
+            bm25_score_recon[bm25_result_dict["top_facts"][sample_idx]] = softmax(
+                bm25_result_dict["top_scores"][sample_idx])
+
+            useqa_score_recon = np.zeros(dataset_statistics[self.dataset]["n_kb"])
+            useqa_score_recon[useqa_result_dict["top_facts"][sample_idx]] = softmax(
+                useqa_result_dict["top_scores"][sample_idx])
+
+            rel_doc_bool_idx_bm25 = np.zeros(dataset_statistics[self.dataset]["n_kb"]).astype(bool)
+            rel_doc_bool_idx_bm25[bm25_result_dict["top_facts"][sample_idx]] = True
+
+            rel_doc_bool_idx_useqa = np.zeros(dataset_statistics[self.dataset]["n_kb"]).astype(bool)
+            rel_doc_bool_idx_useqa[useqa_result_dict["top_facts"][sample_idx]] = True
+
+            rel_doc_bool_idx_combined = rel_doc_bool_idx_bm25 + rel_doc_bool_idx_useqa
+
+            combined_scores = coef*bm25_score_recon + (1-coef)*useqa_score_recon  # This is still the full size.
+
+            combined_scores = combined_scores[rel_doc_bool_idx_combined]
+            rel_doc_idx_combined = np.arange(dataset_statistics[self.dataset]["n_kb"])[rel_doc_bool_idx_combined]
+
+            sorted_facts = rel_doc_idx_combined[
+                np.flip(np.argsort(combined_scores))].tolist()  # sort in the order of descending score
+            end_time = time.time()
+            time_list.append(end_time - start_time)
+
+            mrr = 1 / (1 + sorted_facts.index(gold_label)) if gold_label in sorted_facts else 0
+            mrr_list.append(mrr)
+
+        return np.array(mrr_list), np.array(time_list)
+
+    def reranking_by_linear_combination(self, bm25_test_result_dict, useqa_test_result_dict):
+        mrr, time = self._reranking_by_linear_combination(bm25_test_result_dict, useqa_test_result_dict, self.best_coef)
+
+        print("=" * 20)
+        print("mrr bm25:", np.mean(bm25_test_result_dict["mrr"]))
+        print("mrr useqa:", np.mean(useqa_test_result_dict["mrr"]))
+        print("best coef:", self.best_coef)
+        print("mrr linear sum socre:", np.mean(mrr))
+        print("average sum and reranking time:", np.mean(time))
+
+        return mrr, time
 
 def debug_experiment(dataset = "openbook"):
     dataset_results = LoadRawData(dataset)
@@ -358,38 +424,48 @@ class ExperimentOpenbook():
 
     def run_all_exp(self):
 
-        # do unsupervised sum with warm ups
-        unsupervised_sum = UnsupervisedSum(self.dataset_results.result_dev_bm25, self.dataset_results.result_dev_useqa, self.dataset)
-        _ = unsupervised_sum.reranking_with_sum_score(self.dataset_results.result_dev_bm25, self.dataset_results.result_dev_useqa)
-        unsupervised_sum_mrr, unsupervised_sum_time = unsupervised_sum.reranking_with_sum_score(self.dataset_results.result_test_bm25, self.dataset_results.result_test_useqa)
+        linear_sum = LinearSum(self.dataset_results.result_dev_bm25, self.dataset_results.result_dev_useqa,
+                               self.dataset)
+        _ = linear_sum.reranking_by_linear_combination(self.dataset_results.result_dev_bm25,
+                                                       self.dataset_results.result_dev_useqa)
+        linear_sum_mrr, linear_sum_time = linear_sum.reranking_by_linear_combination(
+            self.dataset_results.result_test_bm25, self.dataset_results.result_test_useqa)
 
-        # do hyrbid threshold with warm ups
-        thresholdClassifier = UnsupervisedThreshold(self.dataset_results.result_dev_bm25, self.dataset_results.result_dev_useqa,
-                                                    self.dataset)
-        _ = thresholdClassifier.reranking_by_threshold(self.dataset_results.result_dev_bm25, self.dataset_results.result_dev_useqa)
-        hybrid_threshold_mrr, hybrid_threshold_neural_used, hybrid_threshold_time = thresholdClassifier.reranking_by_threshold(self.dataset_results.result_test_bm25, self.dataset_results.result_test_useqa)
-
-        # do hyrbid logistic regression with warm ups
-        lrClassifier = LogisticRegressionRouter(self.dataset_results.result_dev_bm25, self.dataset_results.result_dev_useqa,
-                                                self.dataset, 7)
-        _ =lrClassifier.reranking_by_lr_router(self.dataset_results.result_dev_bm25, self.dataset_results.result_dev_useqa)
-        hybrid_lr_mrr, hybrid_lr_neural_used, hybrid_lr_time =lrClassifier.reranking_by_lr_router(self.dataset_results.result_test_bm25, self.dataset_results.result_test_useqa)
-
-        print(np.mean(unsupervised_sum_mrr))
-        print(np.mean(hybrid_threshold_mrr))
-        print(np.mean(hybrid_lr_mrr))
-
-        print(np.sum(hybrid_threshold_neural_used))
-        print(np.sum(hybrid_lr_neural_used))
-
-        final_result_dict = {
-            "unsupervised_sum":{"mrr":unsupervised_sum_mrr, "time":unsupervised_sum_time},
-            "hybrid_threshold":{"mrr": hybrid_threshold_mrr, "router_output":hybrid_threshold_neural_used, "time":hybrid_threshold_time},
-            "hybrid_lr":{"mrr": hybrid_lr_mrr, "router_output":hybrid_lr_neural_used, "time":hybrid_lr_time}
-        }
-
-        with open(generated_data_path+"hybrid_classifier_result/openbook_hybrid_result.pickle", "wb") as handle:
-            pickle.dump(final_result_dict, handle)
+        # TODO: change this back after experiment
+        # # do unsupervised sum with warm ups
+        # unsupervised_sum = UnsupervisedSum(self.dataset_results.result_dev_bm25, self.dataset_results.result_dev_useqa, self.dataset)
+        # _ = unsupervised_sum.reranking_with_sum_score(self.dataset_results.result_dev_bm25, self.dataset_results.result_dev_useqa)
+        # unsupervised_sum_mrr, unsupervised_sum_time = unsupervised_sum.reranking_with_sum_score(self.dataset_results.result_test_bm25, self.dataset_results.result_test_useqa)
+        #
+        # # do hyrbid threshold with warm ups
+        # thresholdClassifier = UnsupervisedThreshold(self.dataset_results.result_dev_bm25, self.dataset_results.result_dev_useqa,
+        #                                             self.dataset)
+        # _ = thresholdClassifier.reranking_by_threshold(self.dataset_results.result_dev_bm25, self.dataset_results.result_dev_useqa)
+        # hybrid_threshold_mrr, hybrid_threshold_neural_used, hybrid_threshold_time = thresholdClassifier.reranking_by_threshold(self.dataset_results.result_test_bm25, self.dataset_results.result_test_useqa)
+        #
+        # # do hyrbid logistic regression with warm ups
+        # lrClassifier = LogisticRegressionRouter(self.dataset_results.result_dev_bm25, self.dataset_results.result_dev_useqa,
+        #                                         self.dataset, 7)
+        # _ =lrClassifier.reranking_by_lr_router(self.dataset_results.result_dev_bm25, self.dataset_results.result_dev_useqa)
+        # hybrid_lr_mrr, hybrid_lr_neural_used, hybrid_lr_time =lrClassifier.reranking_by_lr_router(self.dataset_results.result_test_bm25, self.dataset_results.result_test_useqa)
+        #
+        #
+        # print(np.mean(unsupervised_sum_mrr))
+        # print(np.mean(hybrid_threshold_mrr))
+        # print(np.mean(hybrid_lr_mrr))
+        #
+        # print(np.sum(hybrid_threshold_neural_used))
+        # print(np.sum(hybrid_lr_neural_used))
+        #
+        # final_result_dict = {
+        #     "linear_sum":{"mrr":linear_sum_mrr, "time":linear_sum_time},
+        #     "unsupervised_sum":{"mrr":unsupervised_sum_mrr, "time":unsupervised_sum_time},
+        #     "hybrid_threshold":{"mrr": hybrid_threshold_mrr, "router_output":hybrid_threshold_neural_used, "time":hybrid_threshold_time},
+        #     "hybrid_lr":{"mrr": hybrid_lr_mrr, "router_output":hybrid_lr_neural_used, "time":hybrid_lr_time}
+        # }
+        #
+        # with open(generated_data_path+"hybrid_classifier_result/openbook_hybrid_result.pickle", "wb") as handle:
+        #     pickle.dump(final_result_dict, handle)
 
 class ExperimentSquad():
     def __init__(self):
@@ -421,38 +497,47 @@ class ExperimentSquad():
     def run_one_split(self, bm25_dev_split, useqa_dev_split):
         final_result_dict = {}
 
-        # do unsupervised sum with warm ups
-        unsupervised_sum = UnsupervisedSum(bm25_dev_split, useqa_dev_split, self.dataset)
-        _ = unsupervised_sum.reranking_with_sum_score(bm25_dev_split, useqa_dev_split)
-        unsupervised_sum_mrr, unsupervised_sum_time = unsupervised_sum.reranking_with_sum_score(
+        linear_sum = LinearSum(bm25_dev_split, useqa_dev_split,
+                               self.dataset)
+        _ = linear_sum.reranking_by_linear_combination(bm25_dev_split, useqa_dev_split)
+        linear_sum_mrr, linear_sum_time = linear_sum.reranking_by_linear_combination(
             self.dataset_results.result_test_bm25, self.dataset_results.result_test_useqa)
 
-        # do hyrbid threshold with warm ups
-        thresholdClassifier = UnsupervisedThreshold(bm25_dev_split, useqa_dev_split,self.dataset)
-        _ = thresholdClassifier.reranking_by_threshold(bm25_dev_split, useqa_dev_split)
-        hybrid_threshold_mrr, hybrid_threshold_neural_used, hybrid_threshold_time = thresholdClassifier.reranking_by_threshold(
-            self.dataset_results.result_test_bm25, self.dataset_results.result_test_useqa)
 
-        # do hyrbid logistic regression with warm ups
-        lrClassifier = LogisticRegressionRouter(bm25_dev_split, useqa_dev_split, self.dataset,7)
-        _ = lrClassifier.reranking_by_lr_router(bm25_dev_split, useqa_dev_split)
-        hybrid_lr_mrr, hybrid_lr_neural_used, hybrid_lr_time = lrClassifier.reranking_by_lr_router(
-            self.dataset_results.result_test_bm25, self.dataset_results.result_test_useqa)
-
-        print(np.mean(unsupervised_sum_mrr))
-        print(np.mean(hybrid_threshold_mrr))
-        print(np.mean(hybrid_lr_mrr))
-
-        print(np.sum(hybrid_threshold_neural_used))
-        print(np.sum(hybrid_lr_neural_used))
-
-        final_result_dict = {
-            "unsupervised_sum": {"mrr": unsupervised_sum_mrr, "time": unsupervised_sum_time},
-            "hybrid_threshold": {"mrr": hybrid_threshold_mrr, "router_output": hybrid_threshold_neural_used,
-                                  "time": hybrid_threshold_time},
-            "hybrid_lr": {"mrr": hybrid_lr_mrr, "router_output": hybrid_lr_neural_used, "time": hybrid_lr_time},
-            "dev_index_in_train_list":useqa_dev_split["dev_index_in_train_list"]
-        }
+        # TODO: change this back after experiment
+        # # do unsupervised sum with warm ups
+        # unsupervised_sum = UnsupervisedSum(bm25_dev_split, useqa_dev_split, self.dataset)
+        # _ = unsupervised_sum.reranking_with_sum_score(bm25_dev_split, useqa_dev_split)
+        # unsupervised_sum_mrr, unsupervised_sum_time = unsupervised_sum.reranking_with_sum_score(
+        #     self.dataset_results.result_test_bm25, self.dataset_results.result_test_useqa)
+        #
+        # # do hyrbid threshold with warm ups
+        # thresholdClassifier = UnsupervisedThreshold(bm25_dev_split, useqa_dev_split,self.dataset)
+        # _ = thresholdClassifier.reranking_by_threshold(bm25_dev_split, useqa_dev_split)
+        # hybrid_threshold_mrr, hybrid_threshold_neural_used, hybrid_threshold_time = thresholdClassifier.reranking_by_threshold(
+        #     self.dataset_results.result_test_bm25, self.dataset_results.result_test_useqa)
+        #
+        # # do hyrbid logistic regression with warm ups
+        # lrClassifier = LogisticRegressionRouter(bm25_dev_split, useqa_dev_split, self.dataset,7)
+        # _ = lrClassifier.reranking_by_lr_router(bm25_dev_split, useqa_dev_split)
+        # hybrid_lr_mrr, hybrid_lr_neural_used, hybrid_lr_time = lrClassifier.reranking_by_lr_router(
+        #     self.dataset_results.result_test_bm25, self.dataset_results.result_test_useqa)
+        #
+        # print(np.mean(unsupervised_sum_mrr))
+        # print(np.mean(hybrid_threshold_mrr))
+        # print(np.mean(hybrid_lr_mrr))
+        #
+        # print(np.sum(hybrid_threshold_neural_used))
+        # print(np.sum(hybrid_lr_neural_used))
+        #
+        # final_result_dict = {
+        #     "linear_sum": {"mrr": linear_sum_mrr, "time": linear_sum_time},
+        #     "unsupervised_sum": {"mrr": unsupervised_sum_mrr, "time": unsupervised_sum_time},
+        #     "hybrid_threshold": {"mrr": hybrid_threshold_mrr, "router_output": hybrid_threshold_neural_used,
+        #                           "time": hybrid_threshold_time},
+        #     "hybrid_lr": {"mrr": hybrid_lr_mrr, "router_output": hybrid_lr_neural_used, "time": hybrid_lr_time},
+        #     "dev_index_in_train_list":useqa_dev_split["dev_index_in_train_list"]
+        # }
 
         return final_result_dict
 
@@ -463,6 +548,7 @@ class ExperimentSquad():
         all_results = []
         unsupervised_sum = []
         hybrid_threshold = []
+        linear_sum = []
         hybrid_lr = []
         for i, dev_split in enumerate(dev_splits):
             print("="*30)
@@ -470,17 +556,19 @@ class ExperimentSquad():
             final_result_dict = self.run_one_split(dev_split[0],dev_split[1])
             all_results.append(final_result_dict)
 
-            unsupervised_sum.append(final_result_dict["unsupervised_sum"]["mrr"])
-            hybrid_threshold.append(final_result_dict["hybrid_threshold"]["mrr"])
-            hybrid_lr.append(final_result_dict["hybrid_lr"]["mrr"])
+            # TODO: change this back after experiment
+        #     unsupervised_sum.append(final_result_dict["unsupervised_sum"]["mrr"])
+        #     hybrid_threshold.append(final_result_dict["hybrid_threshold"]["mrr"])
+        #     hybrid_lr.append(final_result_dict["hybrid_lr"]["mrr"])
+        #
+        #
+        # print(np.mean(np.array(unsupervised_sum)))
+        # print(np.mean(np.array(hybrid_threshold)))
+        # print(np.mean(np.array(hybrid_lr)))
 
 
-        print(np.mean(np.array(unsupervised_sum)))
-        print(np.mean(np.array(hybrid_threshold)))
-        print(np.mean(np.array(hybrid_lr)))
-
-        with open(generated_data_path+"hybrid_classifier_result/squad_hybrid_result.pickle", "wb") as handle:
-            pickle.dump(all_results, handle)
+        # with open(generated_data_path+"hybrid_classifier_result/squad_hybrid_result.pickle", "wb") as handle:
+        #     pickle.dump(all_results, handle)
 
         return 0
 
@@ -535,40 +623,47 @@ class ExperimentNQ():
     def run_one_split(self, bm25_dev_split, useqa_dev_split, bm25_test_split, useqa_test_split):
         final_result_dict = {}
 
-        # do unsupervised sum with warm ups
-        unsupervised_sum = UnsupervisedSum(bm25_dev_split, useqa_dev_split, self.dataset)
-        _ = unsupervised_sum.reranking_with_sum_score(bm25_dev_split, useqa_dev_split)
-        unsupervised_sum_mrr, unsupervised_sum_time = unsupervised_sum.reranking_with_sum_score(
-            bm25_test_split, useqa_test_split)
-        #unsupervised_sum_mrr, unsupervised_sum_time = 0,0
+        linear_sum = LinearSum(bm25_dev_split, useqa_dev_split,self.dataset)
+        _ = linear_sum.reranking_by_linear_combination(bm25_dev_split, useqa_dev_split,)
+        linear_sum_mrr, linear_sum_time = linear_sum.reranking_by_linear_combination(bm25_test_split, useqa_test_split)
 
-        # do hyrbid threshold with warm ups
-        thresholdClassifier = UnsupervisedThreshold(bm25_dev_split, useqa_dev_split, self.dataset)
-        _ = thresholdClassifier.reranking_by_threshold(bm25_dev_split, useqa_dev_split)
-        hybrid_threshold_mrr, hybrid_threshold_neural_used, hybrid_threshold_time = thresholdClassifier.reranking_by_threshold(
-            bm25_test_split, useqa_test_split)
+        # TODO: change this back after experiment
 
-        # do hyrbid logistic regression with warm ups
-        lrClassifier = LogisticRegressionRouter(bm25_dev_split, useqa_dev_split, self.dataset,7)
-        _ = lrClassifier.reranking_by_lr_router(bm25_dev_split, useqa_dev_split)
-        hybrid_lr_mrr, hybrid_lr_neural_used, hybrid_lr_time = lrClassifier.reranking_by_lr_router(
-            bm25_test_split, useqa_test_split)
-
-        print(np.mean(unsupervised_sum_mrr))
-        print(np.mean(hybrid_threshold_mrr))
-        print(np.mean(hybrid_lr_mrr))
-
-        print(np.sum(hybrid_threshold_neural_used))
-        print(np.sum(hybrid_lr_neural_used))
-
-        final_result_dict = {
-            "unsupervised_sum": {"mrr": unsupervised_sum_mrr, "time": unsupervised_sum_time},
-            "hybrid_threshold": {"mrr": hybrid_threshold_mrr, "router_output": hybrid_threshold_neural_used,
-                                  "time": hybrid_threshold_time},
-            "hybrid_lr": {"mrr": hybrid_lr_mrr, "router_output": hybrid_lr_neural_used, "time": hybrid_lr_time},
-            "dev_index_in_all_list":useqa_dev_split["dev_index_in_all_list"],
-            "test_index_in_all_list": useqa_test_split["test_index_in_all_list"],
-        }
+        # # do unsupervised sum with warm ups
+        # unsupervised_sum = UnsupervisedSum(bm25_dev_split, useqa_dev_split, self.dataset)
+        # _ = unsupervised_sum.reranking_with_sum_score(bm25_dev_split, useqa_dev_split)
+        # unsupervised_sum_mrr, unsupervised_sum_time = unsupervised_sum.reranking_with_sum_score(
+        #     bm25_test_split, useqa_test_split)
+        # #unsupervised_sum_mrr, unsupervised_sum_time = 0,0
+        #
+        # # do hyrbid threshold with warm ups
+        # thresholdClassifier = UnsupervisedThreshold(bm25_dev_split, useqa_dev_split, self.dataset)
+        # _ = thresholdClassifier.reranking_by_threshold(bm25_dev_split, useqa_dev_split)
+        # hybrid_threshold_mrr, hybrid_threshold_neural_used, hybrid_threshold_time = thresholdClassifier.reranking_by_threshold(
+        #     bm25_test_split, useqa_test_split)
+        #
+        # # do hyrbid logistic regression with warm ups
+        # lrClassifier = LogisticRegressionRouter(bm25_dev_split, useqa_dev_split, self.dataset,7)
+        # _ = lrClassifier.reranking_by_lr_router(bm25_dev_split, useqa_dev_split)
+        # hybrid_lr_mrr, hybrid_lr_neural_used, hybrid_lr_time = lrClassifier.reranking_by_lr_router(
+        #     bm25_test_split, useqa_test_split)
+        #
+        # print(np.mean(unsupervised_sum_mrr))
+        # print(np.mean(hybrid_threshold_mrr))
+        # print(np.mean(hybrid_lr_mrr))
+        #
+        # print(np.sum(hybrid_threshold_neural_used))
+        # print(np.sum(hybrid_lr_neural_used))
+        #
+        # final_result_dict = {
+        #     "linear_sum": {"mrr": linear_sum_mrr, "time": linear_sum_time},
+        #     "unsupervised_sum": {"mrr": unsupervised_sum_mrr, "time": unsupervised_sum_time},
+        #     "hybrid_threshold": {"mrr": hybrid_threshold_mrr, "router_output": hybrid_threshold_neural_used,
+        #                           "time": hybrid_threshold_time},
+        #     "hybrid_lr": {"mrr": hybrid_lr_mrr, "router_output": hybrid_lr_neural_used, "time": hybrid_lr_time},
+        #     "dev_index_in_all_list":useqa_dev_split["dev_index_in_all_list"],
+        #     "test_index_in_all_list": useqa_test_split["test_index_in_all_list"],
+        # }
 
         return final_result_dict
 
@@ -588,29 +683,29 @@ class ExperimentNQ():
             final_result_dict = self.run_one_split(dev_split[0],dev_split[1], dev_split[2],dev_split[3])
             all_results.append(final_result_dict)
 
-            print(final_result_dict.keys())
-            print(final_result_dict["hybrid_threshold"].keys())
+            # TODO: change this back
+
+        #     unsupervised_sum.append(final_result_dict["unsupervised_sum"]["mrr"])
+        #     hybrid_threshold.append(final_result_dict["hybrid_threshold"]["mrr"])
+        #     hybrid_lr.append(final_result_dict["hybrid_lr"]["mrr"])
+        #
+        #
+        # print(np.mean(np.array(unsupervised_sum)))
+        # print(np.mean(np.array(hybrid_threshold)))
+        # print(np.mean(np.array(hybrid_lr)))
 
 
-            unsupervised_sum.append(final_result_dict["unsupervised_sum"]["mrr"])
-            hybrid_threshold.append(final_result_dict["hybrid_threshold"]["mrr"])
-            hybrid_lr.append(final_result_dict["hybrid_lr"]["mrr"])
-
-
-        print(np.mean(np.array(unsupervised_sum)))
-        print(np.mean(np.array(hybrid_threshold)))
-        print(np.mean(np.array(hybrid_lr)))
-
-        with open(generated_data_path+"hybrid_classifier_result/nq_hybrid_result.pickle", "wb") as handle:
-            pickle.dump(all_results, handle)
+        # TODO: change this back after experiment.
+        # with open(generated_data_path+"hybrid_classifier_result/nq_hybrid_result.pickle", "wb") as handle:
+        #     pickle.dump(all_results, handle)
 
         return 0
 
-experimentOpenbook = ExperimentOpenbook()
-experimentOpenbook.run_all_exp()
-
-experimentSquad = ExperimentSquad()
-experimentSquad.run_all_splits()
+# experimentOpenbook = ExperimentOpenbook()
+# experimentOpenbook.run_all_exp()
+#
+# experimentSquad = ExperimentSquad()
+# experimentSquad.run_all_splits()
 
 experimentNQ = ExperimentNQ()
 experimentNQ.run_all_splits()
