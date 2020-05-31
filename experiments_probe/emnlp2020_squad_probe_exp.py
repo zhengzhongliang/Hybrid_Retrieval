@@ -268,12 +268,12 @@ def experiments_squad_manual_check(device, data_partition = "train", print_text 
     probe_model_path = probe_model_root_path+"query_"+embd_type+"_embd_"+label_type+"_result_seed_"+str(seed)+"/best_linear_prober"
     saved_data_folder = 'data_generated/squad/'
 
-    train_list, dev_list, test_list, sci_kb = utils_dataset_squad.construct_retrieval_dataset_squad()
-    vocab_dict, tfidf_vectorizer = utils_probe_squad.get_vocabulary(train_list, sci_kb,
+    train_list, dev_list, kb = utils_dataset_squad.load_squad_probe_raw_data()
+    vocab_dict, tfidf_vectorizer = utils_probe_squad.get_vocabulary(train_list, kb,
                                                                 saved_data_folder + "squad_vocab_dict.pickle",
                                                                 saved_data_folder + "squad_tfidf_vectorizer.pickle")
 
-    instances_all_seeds = utils_probe_squad.get_probe_dataset(train_list, dev_list, sci_kb, "",
+    instances_all_seeds = utils_probe_squad.get_probe_dataset(train_list, dev_list, kb, "",
                                                           vocab_dict, tfidf_vectorizer, saved_data_folder,
                                                           "squad_probe.pickle")
 
@@ -392,8 +392,8 @@ def main():
     print(device)
     print('threads after set:', torch.get_num_threads())
 
-    #experiments_squad(device)
-    experiments_squad_manual_check(device, data_partition="dev", print_text = True, label_type = "gold")
+    experiments_squad(device)
+    #experiments_squad_manual_check(device, data_partition="dev", print_text = True, label_type = "gold")
 
     return 0
 
