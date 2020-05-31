@@ -235,28 +235,28 @@ def experiments_squad(device):
         experiment = Experiment(vocab_dict, tfidf_vectorizer, saved_result_folder_path, random_seed, model_type = "useqa",
                                 input_type = "query_useqa_embd", label_type = "gold", device = device)
         experiment.train_all(instances_all_seeds[random_seed]["train"], instances_all_seeds[random_seed]["dev"],
-                             vocab_dict, 20)
+                             vocab_dict, 5)
 
 
         # Exp2: useqa random embedding and gold probe label.
         experiment = Experiment(vocab_dict, tfidf_vectorizer, saved_result_folder_path, random_seed, model_type="useqa",
                                 input_type="query_random_embd", label_type="gold", device=device)
         experiment.train_all(instances_all_seeds[random_seed]["train"], instances_all_seeds[random_seed]["dev"],
-                             vocab_dict, 10)
+                             vocab_dict, 5)
 
 
         # Exp3: tf-idf embedding and gold probe label.
         experiment = Experiment(vocab_dict, tfidf_vectorizer, saved_result_folder_path, random_seed, model_type="tfidf",
                                 input_type="query_tfidf_embd", label_type="gold", device=device)
         experiment.train_all(instances_all_seeds[random_seed]["train"], instances_all_seeds[random_seed]["dev"],
-                             vocab_dict, 50)
+                             vocab_dict, 10)
 
 
         # Exp4: useqa trained embedding and question shuffled probe label.
         experiment = Experiment(vocab_dict, tfidf_vectorizer, saved_result_folder_path, random_seed, model_type="useqa",
                                 input_type="query_useqa_embd", label_type="ques_shuffle", device=device)
         experiment.train_all(instances_all_seeds[random_seed]["train"], instances_all_seeds[random_seed]["dev"],
-                             vocab_dict, 10)
+                             vocab_dict, 5)
 
 
         # Exp5: useqa trained embedding and token remapped probe label.

@@ -16,7 +16,7 @@ def get_map(pred_scores, target_indices):
 
     return map
 
-def get_ppl(pred_scores, target_indices):
+def get_ppl_(pred_scores, target_indices):
     assert (isinstance(pred_scores, np.ndarray))
     assert (isinstance(target_indices, np.ndarray))
 
@@ -25,5 +25,17 @@ def get_ppl(pred_scores, target_indices):
     probs_raw = pred_scores[target_indices]
 
     ppl = np.power(np.prod(1/probs_raw),1/n_target_token)
+
+    return ppl
+
+def get_ppl(pred_scores, target_indices):
+    assert (isinstance(pred_scores, np.ndarray))
+    assert (isinstance(target_indices, np.ndarray))
+
+    n_target_token = len(target_indices)
+
+    probs_raw = pred_scores[target_indices]
+
+    ppl = np.exp(np.sum(np.log(1/probs_raw))/n_target_token)
 
     return ppl
