@@ -153,11 +153,11 @@ def instance_raw_to_probe(instances_list, kb,  useqa_embd_path, vocab_dict, voca
             query_useqa_embd = useqa_embds[i]
             instance_dict_probe["query_useqa_embd"] = torch.tensor(query_useqa_embd, dtype = torch.float32)
             instance_dict_probe["query_random_embd"] = torch.tensor(np.random.rand(512), dtype = torch.float32)
-            instance_dict_probe["query_tfidf_embd"] = torch.tensor(tfidf_vectorizer.transform(instance["query"]).todense(), dtype = torch.float32).squeeze()
+            instance_dict_probe["query_tfidf_embd"] = torch.tensor(tfidf_vectorizer.transform([instance["query"]]).todense(), dtype = torch.float32).squeeze()
 
             # Generate training labels for the probe task
-            lemmas_query = [wnl_lemmatizer.lemmatize(t) for t in word_tokenize(instance["query"][0].lower())]
-            tokens_fact = kb[instance["facts"][0]]
+            lemmas_query = [wnl_lemmatizer.lemmatize(t) for t in word_tokenize(instance["query"].lower())]
+            tokens_fact = kb[instance["facts"]]
             lemmas_fact = [wnl_lemmatizer.lemmatize(t) for t in word_tokenize(tokens_fact.lower())]
             lemmas_negative = get_negative_lemmas(lemmas_query+lemmas_fact, vocab_dict)
 
