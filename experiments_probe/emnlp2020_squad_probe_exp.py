@@ -242,7 +242,7 @@ def experiments_squad(device):
         experiment = Experiment(vocab_dict, tfidf_vectorizer, saved_result_folder_path, random_seed, model_type="useqa",
                                 input_type="query_random_embd", label_type="gold", device=device)
         experiment.train_all(instances_all_seeds[random_seed]["train"], instances_all_seeds[random_seed]["dev"],
-                             vocab_dict, 3)
+                             vocab_dict, 4)
 
 
         # Exp3: tf-idf embedding and gold probe label.  Best @ epoch epoch 2
@@ -412,8 +412,8 @@ def main():
     print(device)
     print('threads after set:', torch.get_num_threads())
 
-    #experiments_squad(device)
-    experiments_squad_manual_check(device, data_partition="dev", print_text = True, label_type = "gold")
+    experiments_squad(device)
+    #experiments_squad_manual_check(device, data_partition="dev", print_text = True, label_type = "gold")
 
     return 0
 
