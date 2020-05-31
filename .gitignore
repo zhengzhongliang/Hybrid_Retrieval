@@ -1,3 +1,5 @@
 data_generated/*
 venv/*
 .idea/*
+experiments_probe/temp/*
+
