@@ -393,7 +393,7 @@ def main():
     print('threads after set:', torch.get_num_threads())
 
     #experiments_openbook(device)
-    experiments_openbook_manual_check(device, data_partition="dev", label_type = "gold")
+    experiments_openbook_manual_check(device, data_partition="dev", print_text = True, label_type = "gold")
 
     return 0
 
