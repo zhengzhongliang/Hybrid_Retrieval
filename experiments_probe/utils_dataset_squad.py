@@ -140,6 +140,7 @@ def load_squad_probe_raw_data():
     dev_list = all_data["dev_list"]
     kb = all_data["kb"]
 
+    print("squad probe raw data loaded!")
     print("train list size:",len(train_list))
     print("dev list size:", len(dev_list))
     print("kb size:", len(kb))
