@@ -28,10 +28,14 @@ def generate_probe_result_squad():
             target_map.extend(result_dict["target map:"])
             target_ppl.extend(result_dict["target ppl:"])
 
+
+            print(np.std(result_dict["query map:"]))
+
         print("="*20)
         print(exp_name)
         print("query map\tquery ppl\ttarget map\ttarget ppl")
         print(np.mean(np.array(query_map)), np.mean(np.array(query_ppl)), np.mean(np.array(target_map)), np.mean(np.array(target_ppl)))
+
 
 generate_probe_result_squad()
 
