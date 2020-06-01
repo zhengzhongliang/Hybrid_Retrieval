@@ -28,7 +28,6 @@ def generate_probe_result_squad():
             target_map.extend(result_dict["target map:"])
             target_ppl.extend(result_dict["target ppl:"])
 
-
             print(np.std(result_dict["query map:"]))
 
         print("="*20)

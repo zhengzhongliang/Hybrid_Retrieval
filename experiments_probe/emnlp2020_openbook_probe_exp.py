@@ -319,7 +319,7 @@ def experiments_openbook_manual_check(device, data_partition = "train", print_te
                 print("="*20)
                 print("\tquery:", instance["lemmas_query"])
                 print("\tfact:", instance["lemmas_fact"])
-                print('\ttop pred lemma:', [vocab_dict_rev[idx] for idx in top_preds[:20]])
+                print('\ttop pred lemma:', [(vocab_dict_rev[idx], output[idx]) for idx in top_preds[:20]])
                 input("A")
 
             loss = get_loss(criterion, output, torch.tensor(labels_onehot, dtype=torch.float32).to(device),
