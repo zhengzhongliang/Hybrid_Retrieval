@@ -51,7 +51,7 @@ def generate_probe_result_squad():
 
             print(result_dict["query map:"])
 
-            print(np.std(result_dict["query map:"]))
+            print(np.std(result_dict["target map:"]))
 
         all_results[exp_name] = np.array(query_map)
 
