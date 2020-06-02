@@ -53,7 +53,7 @@ def generate_probe_result_squad():
 
             #print(np.std(result_dict["target map:"]))
 
-        all_results[exp_name] = np.array(target_map)
+        all_results[exp_name] = np.array(target_ppl)
 
         # print("="*20)
         # print(exp_name)
@@ -67,5 +67,7 @@ def generate_probe_result_squad():
 results = generate_probe_result_squad()
 
 print(check_with_bootstrap_resampling(results["tfidf_embd_gold_label"], results["useqa_embd_gold_label"]))
+# squad target map vs tfidf target map: 1.0
+# squad target ppl vs tfidf target ppl:
 
 
