@@ -1,5 +1,25 @@
 import pickle
 import numpy as np
+def check_with_bootstrap_resampling(baseline_mrrs, hybrid_mrrs):
+    print("check with bootstrap resampling ...")
+    print(" baseline shape:", baseline_mrrs.shape, " control shape:", hybrid_mrrs.shape)
+    print("\tbaseline val:", np.mean(baseline_mrrs), " control val:", np.mean(hybrid_mrrs))
+
+    count=0
+    for i in range(10000):
+        sampled_indx = np.random.choice(len(baseline_mrrs), len(hybrid_mrrs))
+
+        baseline_mrr_all = np.sum(baseline_mrrs[sampled_indx])
+        hybrid_mrr_all = np.sum(hybrid_mrrs[sampled_indx])
+
+        if hybrid_mrr_all>baseline_mrr_all:
+            count+=1
+
+        # if i%1000==0:
+        #     print("resampling ", i, " ... tfidf score:",tfdif_mrr_all, " bert score:", bert_mrr_all, " hybrid score:", hybrid_mrr_all )
+
+    return count/10000
+
 
 def generate_probe_result_squad():
 
@@ -12,7 +32,8 @@ def generate_probe_result_squad():
         "useqa_embd_rand_label": "query_useqa_embd_ques_shuffle_result_seed_"
     }
 
-    for exp_name in exp_folder_paths.keys():
+    all_results = {}
+    for exp_name in ["useqa_embd_gold_label", "tfidf_embd_gold_label"]:
         query_map = []
         query_ppl = []
         target_map = []
@@ -30,11 +51,18 @@ def generate_probe_result_squad():
 
             print(np.std(result_dict["query map:"]))
 
-        print("="*20)
-        print(exp_name)
-        print("query map\tquery ppl\ttarget map\ttarget ppl")
-        print(np.mean(np.array(query_map)), np.mean(np.array(query_ppl)), np.mean(np.array(target_map)), np.mean(np.array(target_ppl)))
+        all_results[exp_name] = np.concatenate(query_map)
+
+        # print("="*20)
+        # print(exp_name)
+        # print("query map\tquery ppl\ttarget map\ttarget ppl")
+        # print(np.mean(np.array(query_map)), np.mean(np.array(query_ppl)), np.mean(np.array(target_map)), np.mean(np.array(target_ppl)))
+        #
 
 
-generate_probe_result_squad()
+
+results = generate_probe_result_squad()
+
+print(check_with_bootstrap_resampling(results["tfidf_embd_gold_label"], results["useqa_embd_gold_label"]))
+
 
