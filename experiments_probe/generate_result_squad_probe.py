@@ -49,6 +49,8 @@ def generate_probe_result_squad():
             target_map.extend(result_dict["target map:"])
             target_ppl.extend(result_dict["target ppl:"])
 
+            print(result_dict["query map:"])
+
             print(np.std(result_dict["query map:"]))
 
         all_results[exp_name] = np.concatenate(query_map)
