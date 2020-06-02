@@ -49,11 +49,11 @@ def generate_probe_result_squad():
             target_map.extend(result_dict["target map:"])
             target_ppl.extend(result_dict["target ppl:"])
 
-            print(result_dict["query map:"])
+            #print(result_dict["query map:"])
 
-            print(np.std(result_dict["target map:"]))
+            #print(np.std(result_dict["target map:"]))
 
-        all_results[exp_name] = np.array(query_map)
+        all_results[exp_name] = np.array(target_map)
 
         # print("="*20)
         # print(exp_name)
