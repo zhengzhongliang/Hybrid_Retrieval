@@ -59,6 +59,7 @@ def generate_probe_result_squad():
         # print(np.mean(np.array(query_map)), np.mean(np.array(query_ppl)), np.mean(np.array(target_map)), np.mean(np.array(target_ppl)))
         #
 
+    return all_results
 
 
 results = generate_probe_result_squad()
