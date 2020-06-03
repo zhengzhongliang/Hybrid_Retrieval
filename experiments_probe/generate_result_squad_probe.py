@@ -33,7 +33,7 @@ def generate_probe_result_squad():
     }
 
     all_results = {}
-    for exp_name in ["useqa_embd_gold_label", "tfidf_embd_gold_label"]:
+    for exp_name in ["useqa_embd_gold_label", "tfidf_embd_gold_label" , "rand_embd_gold_label", "useqa_embd_rand_label"]:
         query_map = []
         query_ppl = []
         target_map = []
@@ -44,10 +44,10 @@ def generate_probe_result_squad():
             with open(result_dict_name,"rb") as handle:
                 result_dict = pickle.load(handle)
 
-            query_map.extend(result_dict["query map:"])
-            query_ppl.extend(result_dict["query ppl:"])
-            target_map.extend(result_dict["target map:"])
-            target_ppl.extend(result_dict["target ppl:"])
+            query_map.append(np.mean(result_dict["query map:"]))
+            query_ppl.append(np.mean(result_dict["query ppl:"]))
+            target_map.append(np.mean(result_dict["target map:"]))
+            target_ppl.append(np.mean(result_dict["target ppl:"]))
 
             #print(result_dict["query map:"])
 
@@ -55,9 +55,10 @@ def generate_probe_result_squad():
 
         all_results[exp_name] = np.array(target_ppl)
 
-        # print("="*20)
-        # print(exp_name)
-        # print("query map\tquery ppl\ttarget map\ttarget ppl")
+        print("="*20)
+        print(exp_name)
+        print("query map\tquery ppl\ttarget map\ttarget ppl")
+        print("%.3f {\\tiny $\\pm%.3f$} & %.3f {\\tiny $\\pm%.3f$} & %.3f {\\tiny $\\pm%.3f$} & %.3f {\\tiny $\\pm%.3f$} \\\\" % (np.mean(query_map).item(), np.std(query_map).item(), np.mean(query_ppl).item(), np.std(query_ppl).item(),np.mean(target_map).item(), np.std(target_map).item(), np.mean(target_ppl).item(), np.std(target_ppl).item()))
         # print(np.mean(np.array(query_map)), np.mean(np.array(query_ppl)), np.mean(np.array(target_map)), np.mean(np.array(target_ppl)))
         #
 
@@ -66,8 +67,8 @@ def generate_probe_result_squad():
 
 results = generate_probe_result_squad()
 
-print(check_with_bootstrap_resampling(results["tfidf_embd_gold_label"], results["useqa_embd_gold_label"]))
-# squad target map vs tfidf target map: 1.0
-# squad target ppl vs tfidf target ppl:
+#print(check_with_bootstrap_resampling(results["tfidf_embd_gold_label"], results["useqa_embd_gold_label"]))
+# useqa target map vs tfidf target map: 1.0 (this is good. )
+# useqa target ppl vs tfidf target ppl: 1.0 (means useqa target ppl is larger than tfidf, which is not good)
 
 
