@@ -12,7 +12,7 @@ def generate_probe_result_openbook():
         "useqa_embd_rand_label": "query_useqa_embd_ques_shuffle_result_seed_"
     }
 
-    for exp_name in exp_folder_paths.keys():
+    for exp_name in ["useqa_embd_gold_label", "tfidf_embd_gold_label" , "rand_embd_gold_label", "useqa_embd_rand_label"]:
         query_map = []
         query_ppl = []
         target_map = []
