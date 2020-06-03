@@ -56,6 +56,7 @@ def generate_probe_result_squad():
         all_results[exp_name] = np.array(target_ppl)
 
         print("="*20)
+        print(len(query_map), len(query_ppl), len(target_map), len(target_ppl))
         print(exp_name)
         print("query map\tquery ppl\ttarget map\ttarget ppl")
         print("%.3f {\\tiny $\\pm%.3f$} & %.3f {\\tiny $\\pm%.3f$} & %.3f {\\tiny $\\pm%.3f$} & %.3f {\\tiny $\\pm%.3f$} \\\\" % (np.mean(query_map).item(), np.std(query_map).item(), np.mean(query_ppl).item(), np.std(query_ppl).item(),np.mean(target_map).item(), np.std(target_map).item(), np.mean(target_ppl).item(), np.std(target_ppl).item()))

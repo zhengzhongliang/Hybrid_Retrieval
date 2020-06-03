@@ -23,15 +23,26 @@ def generate_probe_result_openbook():
             with open(result_dict_name,"rb") as handle:
                 result_dict = pickle.load(handle)
 
-            query_map.extend(result_dict["query map:"])
-            query_ppl.extend(result_dict["query ppl:"])
-            target_map.extend(result_dict["target map:"])
-            target_ppl.extend(result_dict["target ppl:"])
+            query_map.append(np.mean(result_dict["query map:"]))
+            query_ppl.append(np.mean(result_dict["query ppl:"]))
+            target_map.append(np.mean(result_dict["target map:"]))
+            target_ppl.append(np.mean(result_dict["target ppl:"]))
 
-        print("="*20)
+            # print(result_dict["query map:"])
+
+            # print(np.std(result_dict["target map:"]))
+
+
+        print("=" * 20)
+        print(len(query_map), len(query_ppl), len(target_map), len(target_ppl))
         print(exp_name)
         print("query map\tquery ppl\ttarget map\ttarget ppl")
-        print(np.mean(np.array(query_map)), np.mean(np.array(query_ppl)), np.mean(np.array(target_map)), np.mean(np.array(target_ppl)))
+        print(
+            "%.3f {\\tiny $\\pm%.3f$} & %.3f {\\tiny $\\pm%.3f$} & %.3f {\\tiny $\\pm%.3f$} & %.3f {\\tiny $\\pm%.3f$} \\\\" % (
+            np.mean(query_map).item(), np.std(query_map).item(), np.mean(query_ppl).item(), np.std(query_ppl).item(),
+            np.mean(target_map).item(), np.std(target_map).item(), np.mean(target_ppl).item(),
+            np.std(target_ppl).item()))
+
 
 generate_probe_result_openbook()
 
